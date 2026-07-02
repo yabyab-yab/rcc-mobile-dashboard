@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Riposte Capital — Research Command Center</title>
+<title>Riposte Capital â€” Research Command Center</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
@@ -284,6 +284,29 @@
   @media (min-width: 769px) { .mobile-cards { display: none; } }
   @media (max-width: 768px) { .table-card .table-wrap { display: none; } }
 
+  /* MOBILE - collapsible sections + activity cleanup (redesign pass) */
+  .section-toggle { display: none; }
+  .filter-controls { display: contents; }
+  @media (max-width: 768px) {
+    .section-toggle {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
+      background: var(--card); border: 1px solid var(--border); color: var(--text);
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+      padding: 11px 14px; border-radius: 8px; cursor: pointer; font-family: inherit;
+    }
+    .section-toggle .chev { color: var(--teal); font-size: 11px; }
+    .filter-label-desktop { display: none; }
+    .filter-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
+    .filter-controls.collapsed { display: none; }
+    .charts-row.collapsed { display: none; }
+    .table-card { order: 1; }
+    .activity-card { order: 2; max-height: 260px; }
+    .ai-change { flex-wrap: nowrap; }
+    .ai-old, .ai-new { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ai-old { flex: 0 1 auto; max-width: 42%; }
+    .ai-new { flex: 1 1 auto; }
+  }
+
   /* PASSWORD GATE (mobile-published copy only) */
   .pw-gate {
     position: fixed; inset: 0; z-index: 5000;
@@ -384,17 +407,22 @@
 </header>
 
 <div class="filter-bar">
-  <span class="filter-label">Filters</span>
-  <div class="filter-group">
-    <select id="fAnalyst"><option value="">All Analysts</option></select>
-    <select id="fSector"><option value="">All Sectors</option></select>
-    <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
-    <select id="fConviction"><option value="">All Conviction</option><option>High</option><option>Developing</option><option>Neutral</option><option>Declining</option></select>
-    <select id="fStatus"><option value="">All Statuses</option><option>Active</option><option>Idea Pipeline</option><option>Archived</option></select>
+  <button class="section-toggle" id="filterToggleBtn" onclick="toggleFilters()">
+    <span>Filters</span><span class="chev" id="filterChev">&#9662;</span>
+  </button>
+  <span class="filter-label filter-label-desktop">Filters</span>
+  <div class="filter-controls collapsed" id="filterControls">
+    <div class="filter-group">
+      <select id="fAnalyst"><option value="">All Analysts</option></select>
+      <select id="fSector"><option value="">All Sectors</option></select>
+      <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
+      <select id="fConviction"><option value="">All Conviction</option><option>High</option><option>Developing</option><option>Neutral</option><option>Declining</option></select>
+      <select id="fStatus"><option value="">All Statuses</option><option>Active</option><option>Idea Pipeline</option><option>Archived</option></select>
+    </div>
+    <div class="filter-divider"></div>
+    <button class="star-filter-btn" id="starFilterBtn" onclick="toggleStarFilter()">&#9733; Starred</button>
+    <button class="reset-btn" onclick="resetFilters()">Reset</button>
   </div>
-  <div class="filter-divider"></div>
-  <button class="star-filter-btn" id="starFilterBtn" onclick="toggleStarFilter()">&#9733; Starred</button>
-  <button class="reset-btn" onclick="resetFilters()">Reset</button>
   <span class="result-count" id="resultCount"></span>
 </div>
 
@@ -403,33 +431,36 @@
   <div class="kpi-row">
     <div class="kpi-card" style="--accent:#007B7F">
       <div class="kpi-label">Total Picks</div>
-      <div class="kpi-value" id="kTotal">—</div>
+      <div class="kpi-value" id="kTotal">â€”</div>
       <div class="kpi-sub">across all analysts</div>
     </div>
     <div class="kpi-card" style="--accent:#22C55E">
       <div class="kpi-label">Active</div>
-      <div class="kpi-value" id="kActive" style="--kv:#22C55E">—</div>
+      <div class="kpi-value" id="kActive" style="--kv:#22C55E">â€”</div>
       <div class="kpi-sub">live positions</div>
     </div>
     <div class="kpi-card" style="--accent:#60A5FA">
       <div class="kpi-label">Idea Pipeline</div>
-      <div class="kpi-value" id="kPipeline" style="--kv:#60A5FA">—</div>
+      <div class="kpi-value" id="kPipeline" style="--kv:#60A5FA">â€”</div>
       <div class="kpi-sub">in research</div>
     </div>
     <div class="kpi-card" style="--accent:#22C55E">
       <div class="kpi-label">Long</div>
-      <div class="kpi-value" id="kLong" style="--kv:#22C55E">—</div>
+      <div class="kpi-value" id="kLong" style="--kv:#22C55E">â€”</div>
       <div class="kpi-sub" id="kLongPct"></div>
     </div>
     <div class="kpi-card" style="--accent:#EF4444">
       <div class="kpi-label">Short</div>
-      <div class="kpi-value" id="kShort" style="--kv:#EF4444">—</div>
+      <div class="kpi-value" id="kShort" style="--kv:#EF4444">â€”</div>
       <div class="kpi-sub" id="kShortPct"></div>
     </div>
   </div>
 
   <!-- CHARTS ROW -->
-  <div class="charts-row">
+  <button class="section-toggle" id="chartsToggleBtn" onclick="toggleCharts()">
+    <span>&#128202; Charts &amp; Breakdown</span><span class="chev" id="chartsChev">&#9662;</span>
+  </button>
+  <div class="charts-row collapsed" id="chartsRow">
     <div class="chart-card">
       <div class="chart-title">Picks by Sector</div>
       <div class="chart-wrap"><canvas id="cSector"></canvas></div>
@@ -471,17 +502,17 @@
           <thead>
             <tr>
               <th style="width:32px;text-align:center;cursor:default">&#9733;</th>
-              <th onclick="sortBy('ticker')">Ticker <span class="sort-icon" id="si-ticker">▲</span></th>
-              <th onclick="sortBy('company')">Company <span class="sort-icon" id="si-company">▲</span></th>
-              <th onclick="sortBy('analyst')">Analyst <span class="sort-icon" id="si-analyst">▲</span></th>
-              <th onclick="sortBy('sector')">Sector <span class="sort-icon" id="si-sector">▲</span></th>
-              <th onclick="sortBy('direction')">Direction <span class="sort-icon" id="si-direction">▲</span></th>
-              <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">▲</span></th>
-              <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">▲</span></th>
-              <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">▲</span></th>
+              <th onclick="sortBy('ticker')">Ticker <span class="sort-icon" id="si-ticker">â–²</span></th>
+              <th onclick="sortBy('company')">Company <span class="sort-icon" id="si-company">â–²</span></th>
+              <th onclick="sortBy('analyst')">Analyst <span class="sort-icon" id="si-analyst">â–²</span></th>
+              <th onclick="sortBy('sector')">Sector <span class="sort-icon" id="si-sector">â–²</span></th>
+              <th onclick="sortBy('direction')">Direction <span class="sort-icon" id="si-direction">â–²</span></th>
+              <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">â–²</span></th>
+              <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">â–²</span></th>
+              <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">â–²</span></th>
               <th>Next Catalyst</th>
               <th>Thesis</th>
-              <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
+              <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">â–²</span></th>
               <th>Docs</th>
               <th>PM Note</th>
             </tr>
@@ -496,17 +527,17 @@
   </div>
 </main>
 
-<footer>Riposte Capital &nbsp;·&nbsp; Research Command Center &nbsp;·&nbsp; For internal use only</footer>
+<footer>Riposte Capital &nbsp;Â·&nbsp; Research Command Center &nbsp;Â·&nbsp; For internal use only</footer>
 
 <!-- PM NOTES MODAL -->
 <div class="modal-overlay" id="noteModal" onclick="handleOverlayClick(event)">
   <div class="modal-box">
     <div class="modal-header">
       <span class="modal-title" id="modalTitle">PM Note</span>
-      <button class="modal-close" onclick="closeNoteModal()">×</button>
+      <button class="modal-close" onclick="closeNoteModal()">Ã—</button>
     </div>
     <div class="modal-stock-info" id="modalStockInfo"></div>
-    <textarea class="note-textarea" id="noteText" placeholder="Type your feedback, questions, or action items for this pick…"></textarea>
+    <textarea class="note-textarea" id="noteText" placeholder="Type your feedback, questions, or action items for this pickâ€¦"></textarea>
     <div class="modal-section-label">Send to analyst via</div>
     <div class="modal-actions">
       <button class="note-btn btn-teams" onclick="sendNoteTeams()">&#128172; Send via Teams</button>
@@ -517,35 +548,50 @@
 
 <script>
 const STOCKS = [
-  { ticker:"LOW", company:"Lowe's Companies Inc.", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"165", status:"Active", catalyst:"FOMC July 29 | HD Earnings Aug 18 | LOW Earnings Aug 19", thesis:"Stagnant Existing Home Sales; misguided M&A strategy", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LOW Presentation v.1.1.pptx?d=w3f3e06dce87d4ef38ca26d668bde1ac2&csf=1&web=1&e=OczqtZ", memo:"" },
-  { ticker:"LEN", company:"Lennar Corporation", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"85", status:"Active", catalyst:"DHI Earnings July 21", thesis:"Housing Starts will disappoint; hits pace-over-price builder", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LEN Discussion November 2025 v.1.1.pptx?d=w94431703a6c74f04ba84dcae4cb2a4c6&csf=1&web=1&e=nzbMSD", memo:"" },
+  { ticker:"LOW", company:"Lowe's Companies Inc.", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"165", status:"Active", catalyst:"FOMC July 29 | HD Earnings Aug 18 | LOW Earnings Aug 19", thesis:"Stagnant Existing Home Sales; misguided M&A strategy", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LOW Presentation v.1.1.pptx?d=w3f3e06dce87d4ef38ca26d668bde1ac2&csf=1&web=1&e=Z33E85", memo:"" },
+  { ticker:"LEN", company:"Lennar Corporation", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"85", status:"Active", catalyst:"DHI Earnings July 21", thesis:"Housing Starts will disappoint; hits pace-over-price builder", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LEN Discussion November 2025 v.1.1.pptx?d=w94431703a6c74f04ba84dcae4cb2a4c6&csf=1&web=1&e=TmQhpc", memo:"" },
   { ticker:"MS", company:"Morgan Stanley", analyst:"James Gildea", sector:"Financials", direction:"Long", conviction:"Developing", target:"250", status:"Idea Pipeline", catalyst:"JPM and GS earnings July 14; MS July 15", thesis:"Weath Management leader; better capital markets activity", date:"2026-07-01", link:"", memo:"" },
   { ticker:"H", company:"Hyatt Hotels Corporation", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"High", target:"48", status:"Idea Pipeline", catalyst:"HLT earns Jul 23; H earns July 30", thesis:"K Shape beneficiary; RevPar strenth; asset monetization", date:"2026-07-01", link:"", memo:"" },
-  { ticker:"DRH", company:"DiamondRock Hospitality Co.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"High", target:"14.5", status:"Active", catalyst:"DRH earns July 30", thesis:"RevPAR tailwind; NAV discount w/ proof; possible takeout", date:"2026-07-01", link:"DRH v.1.1.pptx", memo:"" },
-  { ticker:"JHX", company:"James Hardie Industries", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"High", target:"35", status:"Active", catalyst:"JHX earns August 19; Index incl ?", thesis:"Secular share gainer; benifits of AZEK ongoing; index incl", date:"2026-07-01", link:"JHX Back Ground Slides v.1.2 (1).pptx", memo:"" },
-  { ticker:"VIK", company:"Viking Holdings Ltd", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"80", status:"Archived", catalyst:"VIK earns August 19", thesis:"Pure upper income North America; brand moat; stock expensive", date:"2026-07-01", link:"VIK Investment Case v.1.pptx", memo:"" },
+  { ticker:"DRH", company:"DiamondRock Hospitality Co.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"High", target:"14.5", status:"Active", catalyst:"DRH earns July 30", thesis:"RevPAR tailwind; NAV discount w/ proof; possible takeout", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/DRH v.1.1.pptx?d=w04a4acbd434048878e9dd49fb3b7a616&csf=1&web=1&e=A29mFR", memo:"" },
+  { ticker:"JHX", company:"James Hardie Industries", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"High", target:"35", status:"Active", catalyst:"JHX earns August 19; Index incl ?", thesis:"Secular share gainer; benifits of AZEK ongoing; index incl", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/JHX Back Ground Slides v.1.2 (1).pptx?d=wd875b1bec24c48b1b3c26c0e33a0dfdf&csf=1&web=1&e=mECpzM", memo:"" },
+  { ticker:"VIK", company:"Viking Holdings Ltd", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"80", status:"Archived", catalyst:"VIK earns August 19", thesis:"Pure upper income North America; brand moat; stock expensive", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VIK Investment Case v.1.pptx?d=wc2165a22e0634ce29f856acbc1274d50&csf=1&web=1&e=0t8YJr", memo:"" },
   { ticker:"WSM", company:"Williams-Sonoma Inc.", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"260", status:"Idea Pipeline", catalyst:"WSM earns August 29", thesis:"Consumer strength; Pottery Barn turnaround", date:"2026-07-01", link:"", memo:"" },
-  { ticker:"VICI", company:"VICI Properties Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Short", conviction:"High", target:"15", status:"Idea Pipeline", catalyst:"GLPI earns July 24; VICI July 29", thesis:"CZR exposure; stretching on risky deals", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VICI_Short_Deck_v2.pptx?d=w3d2bc171da5d4eee9f41f3e1ced6ac54&csf=1&web=1&e=qhtaEX", memo:"" },
+  { ticker:"VICI", company:"VICI Properties Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Short", conviction:"High", target:"15", status:"Idea Pipeline", catalyst:"GLPI earns July 24; VICI July 29", thesis:"CZR exposure; stretching on risky deals", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VICI_Short_Deck_v2.pptx?d=w3d2bc171da5d4eee9f41f3e1ced6ac54&csf=1&web=1&e=dZNRWQ", memo:"" },
   { ticker:"CCL", company:"Carnival Corporation", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"105", status:"Archived", catalyst:"RCL earns July 29", thesis:"Inexpensive stock; leisure value proposition; headline risk", date:"2026-06-26", link:"", memo:"" },
   { ticker:"BX", company:"Blackstone Inc.", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"Developing", target:"85", status:"Idea Pipeline", catalyst:"BX earns July 23", thesis:"Too big to grow; private credit fear and AI disrupt fear", date:"2026-06-26", link:"", memo:"" },
   { ticker:"EG", company:"Everest Group Ltd.", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"Developing", target:"14", status:"Idea Pipeline", catalyst:"RNR earns July 23; ACGL July 28; EG Jul 30", thesis:"Sector pricing headwinds, weak player", date:"2026-06-26", link:"", memo:"" },
-  { ticker:"JLL", company:"Jones Lang LaSalle Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"Developing", target:"965", status:"Archived", catalyst:"CBRE earns July 29; JLL July 30", thesis:"CRE transaction volume recovery early innings; tagged as AI loser", date:"2026-07-01", link:"JLL Investment Case v.1.1 (1).pptx", memo:"" },
+  { ticker:"JLL", company:"Jones Lang LaSalle Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"Developing", target:"965", status:"Archived", catalyst:"CBRE earns July 29; JLL July 30", thesis:"CRE transaction volume recovery early innings; tagged as AI loser", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/JLL Investment Case v.1.1 (1).pptx?d=w74d223d2b71c4cf78773d3778b7361f0&csf=1&web=1&e=vurn3h", memo:"" },
   { ticker:"LPX", company:"Louisiana-Pacific Corporation", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"Developing", target:"84", status:"Idea Pipeline", catalyst:"LPX earns August 6", thesis:"Secular share gainer", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LPX_Company_Primer_v1.1.pptx?d=wa84506f0c7a54ca9b05ee9e48a692050&csf=1&web=1&e=UPHPuY", memo:"" },
   { ticker:"QXO", company:"QXO Inc.", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"Developing", target:"30", status:"Active", catalyst:"Closing BLD acquistion end July", thesis:"Merger noise in stock subsides", date:"2026-07-01", link:"", memo:"" },
-  { ticker:"CPNG", company:"Coupang", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"Neutral", target:"2", status:"Active", catalyst:"Earnings July 8", thesis:"", date:"2026-07-01", link:"", memo:"" },
-  { ticker:"INDV", company:"Indivior", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Short", conviction:"High", target:"77", status:"Active", catalyst:"Check Earnings q3 July 3", thesis:"", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"" },
-  { ticker:"JPM", company:"JPMorgan Chase", analyst:"Kamaljit Gill", sector:"Financials", direction:"Long", conviction:"Developing", target:"66", status:"Idea Pipeline", catalyst:"Q2 Earnings July 11", thesis:"NII expansion in rising rate environment", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Indivior Investment Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=j23NAk", memo:"" },
-  { ticker:"PLD", company:"Prologis Inc.", analyst:"Kamaljit Gill", sector:"Real Estate", direction:"Long", conviction:"Developing", target:"234", status:"Idea Pipeline", catalyst:"Q2 Earnings July 8", thesis:"E-commerce tailwinds for industrial REIT", date:"2026-07-01", link:"", memo:"" },
-  { ticker:"NFLX", company:"Netflix Inc.", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Long", conviction:"Developing", target:"54", status:"Idea Pipeline", catalyst:"Q2 Earnings July 17", thesis:"Ad-supported tier driving ARPU expansion", date:"2026-06-26", link:"", memo:"" },
-  { ticker:"AAPL", company:"Apple Inc.", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"High", target:"54", status:"Active", catalyst:"Q3 Earnings Oct 28", thesis:"AI supercycle driving iPhone upgrade cycle", date:"2026-06-26", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AAPL Investment Memo.docx?d=wcba3475bb97e4259910fb5f138de4656&csf=1&web=1&e=tnxiPS" },
-  { ticker:"AMZN", company:"Amazon.com Inc.", analyst:"Tehmur Jabbar", sector:"Consumer Discretionary", direction:"Short", conviction:"Developing", target:"18", status:"Active", catalyst:"AWS re:Invent Dec", thesis:"Capex cycle compressing FCF margins", date:"2026-06-29", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AMZN Investment Memo.docx?d=w62a09702f2644eacb8276c6493f7f494&csf=1&web=1&e=7RXx7v" },
-  { ticker:"UNH", company:"UnitedHealth Group", analyst:"Tehmur Jabbar", sector:"Healthcare", direction:"Short", conviction:"Developing", target:"865", status:"Active", catalyst:"Q2 Earnings July 15", thesis:"MLR expansion risk underappreciated", date:"2026-06-26", link:"", memo:"" },
-  { ticker:"CAT", company:"Caterpillar Inc.", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"Developing", target:"23", status:"Archived", catalyst:"Q2 Earnings July 24", thesis:"Infrastructure spend beneficiary", date:"2026-06-26", link:"", memo:"" }
+  { ticker:"CPNG", company:"Coupang", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"Neutral", target:"22", status:"Archived", catalyst:"Earnings July 8", thesis:"", date:"2026-07-02", link:"", memo:"" },
+  { ticker:"INDV", company:"Indivior", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Long", conviction:"High", target:"30", status:"Archived", catalyst:"Check Earnings q3 July 3", thesis:"", date:"2026-07-02", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"" },
+  { ticker:"JPM", company:"JPMorgan Chase", analyst:"Kamaljit Gill", sector:"Financials", direction:"Long", conviction:"Neutral", target:"68", status:"Idea Pipeline", catalyst:"Q2 Earnings July 12", thesis:"NII expansion in rising rate environment", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Indivior Investment Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=j23NAk", memo:"" },
+  { ticker:"PLD", company:"Prologis Inc.", analyst:"Kamaljit Gill", sector:"Real Estate", direction:"Long", conviction:"Declining", target:"234", status:"Idea Pipeline", catalyst:"Q2 Earnings July 8", thesis:"E-commerce tailwinds for industrial REIT", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"NFLX", company:"Netflix Inc.", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Long", conviction:"Neutral", target:"54", status:"Idea Pipeline", catalyst:"Q2 Earnings July 17", thesis:"Ad-supported tier driving ARPU expansion", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"AAPL", company:"Apple Inc.", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"High", target:"55", status:"Active", catalyst:"Q3 Earnings Oct 28", thesis:"AI supercycle driving iPhone upgrade cycle", date:"2026-06-26", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AAPL Investment Memo.docx?d=wcba3475bb97e4259910fb5f138de4656&csf=1&web=1&e=tnxiPS" },
+  { ticker:"AMZN", company:"Amazon.com Inc.", analyst:"Tehmur Jabbar", sector:"Consumer Discretionary", direction:"Short", conviction:"Developing", target:"17", status:"Active", catalyst:"AWS re:Invent Dec", thesis:"Capex cycle compressing FCF margins", date:"2026-06-29", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AMZN Investment Memo.docx?d=w62a09702f2644eacb8276c6493f7f494&csf=1&web=1&e=7RXx7v" },
+  { ticker:"UNH", company:"UnitedHealth Group", analyst:"Tehmur Jabbar", sector:"Healthcare", direction:"Short", conviction:"Developing", target:"85", status:"Active", catalyst:"Q2 Earnings July 15", thesis:"MLR expansion risk underappreciated", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"CAT", company:"Caterpillar Inc.", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"Developing", target:"24", status:"Archived", catalyst:"Q2 Earnings July 24", thesis:"Infrastructure spend beneficiary", date:"2026-07-02", link:"", memo:"" },
+  { ticker:"DSV DC", company:"DSV A/S", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"High", target:"", status:"", catalyst:"", thesis:"", date:"2026-07-02", link:"", memo:"" }
 ];
 
 
 
+
+
+
+
+
+
+
 const AUDIT = [
+  { ts:"2026-07-02 13:35", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Conviction", oldVal:"", newVal:"High" },
+  { ts:"2026-07-02 13:35", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Direction", oldVal:"", newVal:"Long" },
+  { ts:"2026-07-02 13:35", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Company Name", oldVal:"", newVal:"DSV A/S" },
+  { ts:"2026-07-02 13:34", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Ticker", oldVal:"", newVal:"DSV DC" },
+  { ts:"2026-07-02 12:52", user:"Tehmur Jabbar", ticker:"CAT", field:"Target Price", oldVal:"23", newVal:"24" },
+  { ts:"2026-07-02 12:40", user:"Kamaljit Gill", ticker:"CPNG", field:"Target Price", oldVal:"20", newVal:"22" },
+  { ts:"2026-07-02 11:45", user:"Youssef Ait Boulahri", ticker:"INDV", field:"Target Price", oldVal:"80", newVal:"30" },
   { ts:"2026-07-01 13:22", user:"Youssef Ait Boulahri", ticker:"PLD", field:"Next Catalyst", oldVal:"Q2 Earnings July 16", newVal:"Q2 Earnings July 8" },
   { ts:"2026-07-01 11:49", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Research Link", oldVal:"JLL Investment Case v.1.1 (1).pptx", newVal:"" },
   { ts:"2026-07-01 11:49", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/LPX_Company_Primer_v1.1.pptx?d=wa84506f0c7a54ca9b05ee9e48a692050&csf=1&web=1&e=UPHPuY" },
@@ -588,19 +634,19 @@ const AUDIT = [
   { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Conviction", oldVal:"Developing", newVal:"" },
   { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Direction", oldVal:"Long", newVal:"" },
   { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Sector", oldVal:"Housing", newVal:"" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Analyst", oldVal:"James Gildea", newVal:"" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Company Name", oldVal:"QXO Inc.", newVal:"" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Ticker", oldVal:"QXO", newVal:"" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Thesis / Notes", oldVal:"", newVal:"Merger noise in stock subsides" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Next Catalyst", oldVal:"", newVal:"Closing BLD acquistion end July" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Status", oldVal:"", newVal:"Active" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Target Price", oldVal:"", newVal:"30" },
-  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Conviction", oldVal:"", newVal:"Developing" }
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Analyst", oldVal:"James Gildea", newVal:"" }
 ];
 
 
 
-// ── Stars ─────────────────────────────────────────────────────
+
+
+
+
+
+
+
+// â”€â”€ Stars â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let showStarredOnly = false;
 
 function loadStars() {
@@ -620,7 +666,7 @@ function toggleStarFilter() {
   render();
 }
 
-// ── Catalyst Countdown ────────────────────────────────────────
+// â”€â”€ Catalyst Countdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const MONTH_MAP = {
   january:0,february:1,march:2,april:3,may:4,june:5,july:6,august:7,
   september:8,october:9,november:10,december:11,
@@ -660,7 +706,7 @@ function countdownBadge(catalystStr) {
   return `<span class="countdown ${cls}">${days}d</span>`;
 }
 
-// ── IC Print View ─────────────────────────────────────────────
+// â”€â”€ IC Print View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function toggleICDropdown(e) {
   e.stopPropagation();
   document.getElementById('icDropdownMenu').classList.toggle('open');
@@ -677,19 +723,19 @@ function printIC(mode) {
   if (mode === 'starred') {
     const stars = loadStars();
     data = STOCKS.filter(r => stars[r.ticker]);
-    title = 'Favorites — IC Sheet';
-    if (!data.length) { alert('No starred picks yet. Use the ★ column to star picks first.'); return; }
+    title = 'Favorites â€” IC Sheet';
+    if (!data.length) { alert('No starred picks yet. Use the â˜… column to star picks first.'); return; }
   } else if (mode === 'active') {
     data = STOCKS.filter(r => r.status === 'Active');
-    title = 'Active Picks — IC Sheet';
+    title = 'Active Picks â€” IC Sheet';
   } else if (mode === 'exclude-archived') {
     data = STOCKS.filter(r => r.status !== 'Archived');
-    title = 'Active & Pipeline — IC Sheet';
+    title = 'Active & Pipeline â€” IC Sheet';
   } else {
     data = [...STOCKS];
-    title = 'All Picks — IC Sheet';
+    title = 'All Picks â€” IC Sheet';
   }
-  const subtitle = `${data.length} pick${data.length !== 1 ? 's' : ''} · ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+  const subtitle = `${data.length} pick${data.length !== 1 ? 's' : ''} Â· ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
 
   const rows = data.map(r => {
     const d = nextCatalystDate(r.catalyst);
@@ -698,22 +744,22 @@ function printIC(mode) {
     const daysHtml = (days !== null && days >= 0)
       ? `<span style="background:#E0F2FE;color:#0369A1;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;margin-left:5px">${days === 0 ? 'Today' : days + 'd'}</span>` : '';
     const dirColor = r.direction === 'Long' ? '#16A34A' : r.direction === 'Short' ? '#DC2626' : '#64748B';
-    const thesisCell = r.thesis ? (r.memo ? `<a href="${r.memo}" style="color:#007B7F;text-decoration:none;border-bottom:1px dashed #007B7F">${r.thesis}</a>` : r.thesis) : '—';
+    const thesisCell = r.thesis ? (r.memo ? `<a href="${r.memo}" style="color:#007B7F;text-decoration:none;border-bottom:1px dashed #007B7F">${r.thesis}</a>` : r.thesis) : 'â€”';
     return `<tr>
       <td style="font-weight:900;color:#007B7F;font-size:14px;white-space:nowrap">${r.ticker}</td>
       <td>${r.company}</td>
-      <td style="color:${dirColor};font-weight:700;white-space:nowrap">${r.direction||'—'}</td>
-      <td style="white-space:nowrap">${r.conviction||'—'}</td>
-      <td style="font-weight:700;white-space:nowrap">${r.target ? '$' + parseFloat(r.target).toFixed(2) : '—'}</td>
+      <td style="color:${dirColor};font-weight:700;white-space:nowrap">${r.direction||'â€”'}</td>
+      <td style="white-space:nowrap">${r.conviction||'â€”'}</td>
+      <td style="font-weight:700;white-space:nowrap">${r.target ? '$' + parseFloat(r.target).toFixed(2) : 'â€”'}</td>
       <td style="max-width:260px;font-size:11px;color:#334155">${thesisCell}</td>
-      <td style="font-size:11px;color:#475569">${r.catalyst||'—'}${daysHtml}</td>
+      <td style="font-size:11px;color:#475569">${r.catalyst||'â€”'}${daysHtml}</td>
       <td style="font-size:11px;color:#64748B;white-space:nowrap">${r.analyst}</td>
     </tr>`;
   }).join('');
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head>
-<meta charset="UTF-8"/><title>Riposte Capital — IC Sheet</title>
+<meta charset="UTF-8"/><title>Riposte Capital â€” IC Sheet</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Segoe UI',Arial,sans-serif;color:#1E293B;background:#fff;padding:32px 40px}
@@ -747,12 +793,12 @@ function printIC(mode) {
   <thead><tr><th>Ticker</th><th>Company</th><th>Dir.</th><th>Conviction</th><th>Target</th><th>Thesis</th><th>Next Catalyst</th><th>Analyst</th></tr></thead>
   <tbody>${rows}</tbody>
 </table>
-<div class="ic-footer">Riposte Capital &nbsp;·&nbsp; Research Command Center &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; Internal Use Only</div>
+<div class="ic-footer">Riposte Capital &nbsp;Â·&nbsp; Research Command Center &nbsp;Â·&nbsp; Confidential &nbsp;Â·&nbsp; Internal Use Only</div>
 </body></html>`);
   win.document.close();
 }
 
-// ── Sort state ────────────────────────────────────────────────
+// â”€â”€ Sort state â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let sortKey = 'date', sortDir = -1;
 
 function sortBy(key) {
@@ -762,16 +808,16 @@ function sortBy(key) {
   const si = document.getElementById('si-' + key);
   if (si) {
     si.closest('th').classList.add('sorted');
-    si.textContent = sortDir === 1 ? '▲' : '▼';
+    si.textContent = sortDir === 1 ? 'â–²' : 'â–¼';
   }
   render();
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function unique(arr, key) { return [...new Set(arr.map(d => d[key]).filter(Boolean))].sort(); }
 
 function badge(val) {
-  if (!val) return '<span class="badge-none">—</span>';
+  if (!val) return '<span class="badge-none">â€”</span>';
   const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', High:'high', Developing:'developing', Neutral:'neutral', Declining:'declining', Medium:'med', Low:'low' };
   return `<span class="badge badge-${map[val]||''}">${val}</span>`;
 }
@@ -793,7 +839,7 @@ function timeAgo(tsStr) {
   return `${Math.floor(mins/1440)}d ago`;
 }
 
-// ── Filters ───────────────────────────────────────────────────
+// â”€â”€ Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function getFiltered() {
   const a  = document.getElementById('fAnalyst').value;
   const s  = document.getElementById('fSector').value;
@@ -818,7 +864,7 @@ function getFiltered() {
 
 function count(arr, key, val) { return arr.filter(r => r[key] === val).length; }
 
-// ── KPIs ──────────────────────────────────────────────────────
+// â”€â”€ KPIs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function updateKPIs(data) {
   const withDir = data.filter(r => r.direction);
   document.getElementById('kTotal').textContent    = data.length;
@@ -833,7 +879,7 @@ function updateKPIs(data) {
   document.getElementById('resultCount').textContent = `${data.length} of ${STOCKS.length} picks`;
 }
 
-// ── Charts ────────────────────────────────────────────────────
+// â”€â”€ Charts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let charts = {};
 function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
@@ -896,7 +942,7 @@ function updateCharts(data) {
   });
 }
 
-// ── Activity Feed ─────────────────────────────────────────────
+// â”€â”€ Activity Feed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderActivity() {
   const list = document.getElementById('activityList');
   document.getElementById('auditCount').textContent = AUDIT.length ? `${AUDIT.length} entries` : '';
@@ -913,15 +959,15 @@ function renderActivity() {
         <span class="ai-field">${a.field}</span>
       </div>
       <div class="ai-change">
-        ${a.oldVal ? `<span class="ai-old">${a.oldVal}</span><span class="ai-arrow">→</span>` : ''}
-        <span class="ai-new">${a.newVal || '—'}</span>
+        ${a.oldVal ? `<span class="ai-old">${a.oldVal}</span><span class="ai-arrow">â†’</span>` : ''}
+        <span class="ai-new">${a.newVal || 'â€”'}</span>
       </div>
-      <div class="ai-meta">${a.user} &nbsp;·&nbsp; ${timeAgo(a.ts)}</div>
+      <div class="ai-meta">${a.user} &nbsp;Â·&nbsp; ${timeAgo(a.ts)}</div>
     </div>
   `).join('');
 }
 
-// ── Table ─────────────────────────────────────────────────────
+// â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function updateTable(data) {
   const tbody  = document.getElementById('picksBody');
   const mobile = document.getElementById('mobileCards');
@@ -935,19 +981,19 @@ function updateTable(data) {
     const stale = isStale(r.date) ? '<span class="stale-badge" title="Not updated in 30+ days"></span>' : '';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'★':'☆'}</button></td>
+      <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'â˜…':'â˜†'}</button></td>
       <td class="ticker">${r.ticker}</td>
       <td class="company">${r.company}</td>
       <td>${r.analyst}</td>
-      <td>${r.sector||'<span class="badge-none">—</span>'}</td>
+      <td>${r.sector||'<span class="badge-none">â€”</span>'}</td>
       <td>${badge(r.direction)}</td>
       <td>${badge(r.conviction)}</td>
-      <td class="target-price">${r.target ? '$' + parseFloat(r.target).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '<span class="badge-none">—</span>'}</td>
+      <td class="target-price">${r.target ? '$' + parseFloat(r.target).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '<span class="badge-none">â€”</span>'}</td>
       <td>${badge(r.status)}</td>
-      <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
-      <td class="thesis" title="${r.thesis}">${r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">—</span>'}</td>
+      <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">â€”</span>'}</td>
+      <td class="thesis" title="${r.thesis}">${r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">â€”</span>'}</td>
       <td class="col-updated">${r.date}${stale}</td>
-      <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">—</span>'}</td>
+      <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">â€”</span>'}</td>
       <td><button class="note-icon-btn" onclick="openNoteModal('${r.ticker}')">&#128172; Note</button></td>
     `;
     tbody.appendChild(tr);
@@ -958,7 +1004,7 @@ function updateTable(data) {
       <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
       <div class="mc-company">${r.company}</div>
       <div class="mc-badges">${badge(r.direction)}${r.conviction?badge(r.conviction):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
-      ${r.catalyst?`<div class="mc-catalyst">⚡ ${r.catalyst}</div>`:''}
+      ${r.catalyst?`<div class="mc-catalyst">âš¡ ${r.catalyst}</div>`:''}
       ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
       ${r.link?`<div style="margin-top:8px"><a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View Research</a></div>`:''}
     `;
@@ -966,7 +1012,7 @@ function updateTable(data) {
   });
 }
 
-// ── Main render ───────────────────────────────────────────────
+// â”€â”€ Main render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function render() {
   const data = getFiltered();
   updateKPIs(data);
@@ -982,35 +1028,57 @@ function resetFilters() {
   render();
 }
 
+// â”€â”€ Mobile: collapsible Filters / Charts sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Both start collapsed on phones (via the "collapsed" class already in
+// the HTML) and are always fully visible on desktop regardless of this
+// class - see the .filter-controls / .charts-row.collapsed rules, which
+// only take effect inside the max-width:768px media query.
+function toggleFilters() {
+  const el = document.getElementById('filterControls');
+  const nowCollapsed = el.classList.toggle('collapsed');
+  const open = !nowCollapsed;
+  document.getElementById('filterChev').textContent = open ? 'â–²' : 'â–¼';
+}
+function toggleCharts() {
+  const el = document.getElementById('chartsRow');
+  const nowCollapsed = el.classList.toggle('collapsed');
+  const open = !nowCollapsed;
+  document.getElementById('chartsChev').textContent = open ? 'â–²' : 'â–¼';
+  // Chart.js measures canvas size at construction time - if the row was
+  // hidden (display:none) when charts were first built, they'd render at
+  // 0x0. Rebuilding them right as the row becomes visible fixes that.
+  if (open) { setTimeout(() => updateCharts(getFiltered()), 0); }
+}
+
 function populateFilters() {
   unique(STOCKS,'analyst').forEach(v => document.getElementById('fAnalyst').append(new Option(v,v)));
   unique(STOCKS,'sector').forEach(v  => document.getElementById('fSector').append(new Option(v,v)));
 }
 
-// ── Analyst email map ─────────────────────────────────────────
+// â”€â”€ Analyst email map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ANALYST_EMAILS = {
   'James Gildea':  'james.gildea@ripostecapital.com',
   'Tehmur Jabbar': 'tehmur.jabbar@ripostecapital.com',
   'Kamaljit Gill': 'kjg@ripostecapital.com'
 };
 
-// ── PM Note Modal ─────────────────────────────────────────────
+// â”€â”€ PM Note Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let currentNote = {};
 
 function openNoteModal(ticker) {
   const r = STOCKS.find(s => s.ticker === ticker);
   if (!r) return;
   currentNote = r;
-  document.getElementById('modalTitle').textContent = `PM Note — ${r.ticker}`;
+  document.getElementById('modalTitle').textContent = `PM Note â€” ${r.ticker}`;
   document.getElementById('modalStockInfo').innerHTML =
     `<strong style="color:var(--teal);font-size:13px">${r.ticker}</strong>
      <span>${r.company}</span>
-     <span style="color:var(--border)">·</span>
+     <span style="color:var(--border)">Â·</span>
      <span>${r.analyst}</span>
-     ${r.direction ? `<span style="color:var(--border)">·</span>${badge(r.direction)}` : ''}`;
+     ${r.direction ? `<span style="color:var(--border)">Â·</span>${badge(r.direction)}` : ''}`;
   document.getElementById('noteText').value = '';
   const btn = document.getElementById('copyBtn');
-  btn.textContent = '📋 Copy';
+  btn.textContent = 'ðŸ“‹ Copy';
   btn.classList.remove('copied');
   document.getElementById('noteModal').classList.add('open');
   setTimeout(() => document.getElementById('noteText').focus(), 50);
@@ -1030,7 +1098,7 @@ function sendNoteTeams() {
   const r = currentNote;
   const email = ANALYST_EMAILS[r.analyst];
   if (!email) { alert(`No Teams email on file for ${r.analyst}.`); return; }
-  const msg = `PM Note — ${r.ticker} (${r.company})\n\n${note}\n\n— Research Command Center`;
+  const msg = `PM Note â€” ${r.ticker} (${r.company})\n\n${note}\n\nâ€” Research Command Center`;
   window.open(`https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(email)}&message=${encodeURIComponent(msg)}`, '_blank');
   closeNoteModal();
 }
@@ -1039,16 +1107,16 @@ function copyNote() {
   const note = document.getElementById('noteText').value.trim();
   if (!note) { document.getElementById('noteText').focus(); return; }
   const r = currentNote;
-  const text = `PM Note — ${r.ticker} (${r.company})\nAnalyst: ${r.analyst}\n\n${note}`;
+  const text = `PM Note â€” ${r.ticker} (${r.company})\nAnalyst: ${r.analyst}\n\n${note}`;
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied';
+    btn.textContent = 'âœ“ Copied';
     btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+    setTimeout(() => { btn.textContent = 'ðŸ“‹ Copy'; btn.classList.remove('copied'); }, 2000);
   });
 }
 
-// ── Init ──────────────────────────────────────────────────────
+// â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.getElementById('hdrDate').textContent =
   new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 
