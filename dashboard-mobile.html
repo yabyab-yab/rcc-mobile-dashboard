@@ -299,8 +299,17 @@
     .filter-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
     .filter-controls.collapsed { display: none; }
     .charts-row.collapsed { display: none; }
-    .table-card { order: 1; }
-    .activity-card { order: 2; max-height: 260px; }
+    /* .bottom-row's two children are grid items, which default to
+       min-width:auto - that lets a grid item refuse to shrink below
+       its own content's "natural" size even when the track itself is
+       correctly sized to the phone's width. That was silently forcing
+       .table-card/.activity-card (and everything inside them - the
+       stock cards and activity feed) out to ~1140px wide regardless of
+       screen size, which is why the phone had to zoom the whole page
+       out to fit it - the KPI/chart rows above don't hit this because
+       they aren't sized through a grid item in the same way. */
+    .table-card { order: 1; min-width: 0; }
+    .activity-card { order: 2; max-height: 260px; min-width: 0; }
     .ai-change { flex-wrap: nowrap; }
     .ai-old, .ai-new { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ai-old { flex: 0 1 auto; max-width: 42%; }
