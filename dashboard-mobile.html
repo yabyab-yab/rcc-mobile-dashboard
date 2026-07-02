@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Riposte Capital — Research Command Center</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy:   #1A2B5B;
+    --navy2:  #0F1A3A;
+    --teal:   #007B7F;
+    --teal2:  #005F62;
+    --bg:     #0D1729;
+    --card:   #162040;
+    --card2:  #1C2A52;
+    --border: #263660;
+    --text:   #E8EDF8;
+    --muted:  #8A9CC8;
+    --long:   #22C55E;
+    --short:  #EF4444;
+    --amber:  #F59E0B;
+    --gray:   #6B7280;
+    --high:       #60A5FA;
+    --developing: #A78BFA;
+    --neutral:    #94A3B8;
+    --declining:  #FB923C;
+    --med:        #FBBF24;
+    --low:        #9CA3AF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, var(--navy2) 0%, var(--navy) 100%);
+    border-bottom: 2px solid var(--teal);
+    padding: 14px 28px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  }
+  .logo-area { display: flex; align-items: center; gap: 16px; }
+  .logo-mark svg { width: 52px; height: 42px; }
+  .logo-text .brand { font-size: 22px; font-weight: 800; color: var(--teal); letter-spacing: 1px; }
+  .logo-text .sub   { font-size: 11px; font-weight: 600; color: #8ABFC2; letter-spacing: 3px; }
+  .header-right .title { font-size: 15px; font-weight: 700; }
+  .header-right .date  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* FILTER BAR */
+  .filter-bar {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 12px 28px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .filter-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; white-space: nowrap; }
+  .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  select {
+    background: var(--card2); border: 1px solid var(--border); color: var(--text);
+    font-size: 12px; padding: 5px 28px 5px 10px; border-radius: 6px; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238A9CC8'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 8px center; cursor: pointer; min-width: 130px;
+  }
+  select:focus { outline: none; border-color: var(--teal); }
+  .filter-divider { width: 1px; height: 22px; background: var(--border); }
+  .reset-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--muted);
+    font-size: 11px; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all .2s; font-family: inherit;
+  }
+  .reset-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .result-count { font-size: 11px; color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+  /* MAIN */
+  main { padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; }
+
+  /* KPI CARDS */
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  .kpi-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
+    position: relative; overflow: hidden;
+  }
+  .kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent, var(--teal)); }
+  .kpi-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: var(--kv, var(--text)); line-height: 1; }
+  .kpi-sub   { font-size: 11px; color: var(--muted); }
+
+  /* CHARTS */
+  .charts-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 12px; }
+  .chart-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 16px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .chart-title { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .6px; }
+  .chart-wrap  { position: relative; flex: 1; min-height: 160px; }
+
+  /* ACTIVITY + TABLE ROW */
+  .bottom-row { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: start; }
+
+  /* ACTIVITY FEED */
+  .activity-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    display: flex; flex-direction: column; max-height: 440px;
+  }
+  .activity-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .activity-header .title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+  .activity-list { overflow-y: auto; flex: 1; padding: 8px 0; }
+  .activity-item {
+    padding: 9px 16px; border-bottom: 1px solid rgba(38,54,96,.5);
+    transition: background .15s;
+  }
+  .activity-item:hover { background: var(--card2); }
+  .activity-item:last-child { border-bottom: none; }
+  .ai-top { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .ai-ticker { font-size: 12px; font-weight: 800; color: var(--teal); }
+  .ai-field  { font-size: 11px; color: var(--muted); }
+  .ai-change { font-size: 11px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ai-old    { color: var(--muted); text-decoration: line-through; }
+  .ai-arrow  { color: var(--border); font-size: 10px; }
+  .ai-new    { color: var(--text); font-weight: 600; }
+  .ai-meta   { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .activity-empty { padding: 32px; text-align: center; color: var(--muted); font-size: 12px; }
+
+  /* TABLE */
+  .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .table-header {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .table-header .title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+  .search-box {
+    background: var(--card2); border: 1px solid var(--border); color: var(--text);
+    font-size: 12px; padding: 5px 12px; border-radius: 6px; width: 180px; font-family: inherit;
+  }
+  .search-box:focus { outline: none; border-color: var(--teal); }
+  .search-box::placeholder { color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  thead th {
+    background: var(--navy2); color: var(--muted); font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px; padding: 10px 14px;
+    text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border);
+    cursor: pointer; user-select: none;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-icon { margin-left: 4px; opacity: .4; font-size: 9px; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--teal); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+  tbody tr:hover { background: var(--card2); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
+  td.ticker  { font-weight: 800; color: var(--teal); font-size: 13px; white-space: nowrap; }
+  td.company { color: var(--muted); max-width: 180px; }
+  .badge {
+    display: inline-block; padding: 3px 9px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
+  }
+  .badge-long     { background: rgba(34,197,94,.15);  color: var(--long);  border: 1px solid rgba(34,197,94,.3); }
+  .badge-short    { background: rgba(239,68,68,.15);  color: var(--short); border: 1px solid rgba(239,68,68,.3); }
+  .badge-active   { background: rgba(34,197,94,.12);  color: var(--long);  border: 1px solid rgba(34,197,94,.2); }
+  .badge-pipeline { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
+  .badge-archived { background: rgba(107,114,128,.12);color: var(--gray);  border: 1px solid rgba(107,114,128,.2); }
+  .badge-high       { background: rgba(96,165,250,.12);  color: var(--high);       border: 1px solid rgba(96,165,250,.2); }
+  .badge-developing { background: rgba(167,139,250,.12); color: var(--developing); border: 1px solid rgba(167,139,250,.2); }
+  .badge-neutral    { background: rgba(148,163,184,.12); color: var(--neutral);    border: 1px solid rgba(148,163,184,.2); }
+  .badge-declining  { background: rgba(251,146,60,.12);  color: var(--declining);  border: 1px solid rgba(251,146,60,.2); }
+  .badge-med        { background: rgba(251,191,36,.12);  color: var(--med);        border: 1px solid rgba(251,191,36,.2); }
+  .badge-low        { background: rgba(156,163,175,.12); color: var(--low);        border: 1px solid rgba(156,163,175,.2); }
+  .badge-none     { color: var(--muted); font-size: 11px; }
+  .catalyst { max-width: 200px; color: var(--muted); font-size: 11px; }
+  .thesis   { max-width: 240px; color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thesis-link { color: var(--teal); text-decoration: none; border-bottom: 1px dashed rgba(0,123,127,.4); transition: color .15s, border-color .15s; }
+  .thesis-link:hover { color: #00A8AD; border-bottom-color: var(--teal); }
+  .doc-btn {
+    display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px;
+    border-radius: 6px; font-size: 10px; font-weight: 600;
+    background: rgba(0,123,127,.15); color: var(--teal); border: 1px solid rgba(0,123,127,.35);
+    text-decoration: none; white-space: nowrap; transition: background .15s;
+  }
+  .doc-btn:hover { background: rgba(0,123,127,.3); }
+  td.target-price { font-weight: 700; color: var(--text); white-space: nowrap; text-align: right; }
+  .stale-badge { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); margin-left: 4px; vertical-align: middle; title: "Not updated in 30+ days"; }
+  .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
+
+  /* FOOTER */
+  footer { text-align: center; padding: 16px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 4px; }
+
+  /* PM NOTES MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.65);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    width: 480px; max-width: 95vw; padding: 24px; display: flex; flex-direction: column; gap: 14px;
+    box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 14px; font-weight: 800; color: var(--teal); }
+  .modal-close {
+    background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer;
+    line-height: 1; padding: 0 4px; transition: color .15s;
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-stock-info { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .note-textarea {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px;
+    padding: 12px; resize: vertical; min-height: 110px; width: 100%; transition: border-color .2s;
+  }
+  .note-textarea:focus { outline: none; border-color: var(--teal); }
+  .note-textarea::placeholder { color: var(--muted); }
+  .modal-section-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+  .modal-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .note-btn {
+    flex: 1; min-width: 120px; padding: 9px 14px; border-radius: 8px; font-size: 12px;
+    font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: opacity .15s;
+  }
+  .note-btn:hover { opacity: .85; }
+  .btn-teams { background: #5b5ea6; color: #fff; }
+  .btn-email { background: var(--teal2); color: #fff; }
+  .btn-copy  { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+  .btn-copy.copied { background: rgba(34,197,94,.2); color: var(--long); border-color: rgba(34,197,94,.4); }
+  .note-icon-btn {
+    background: rgba(0,123,127,.1); border: 1px solid rgba(0,123,127,.25); color: var(--teal);
+    border-radius: 6px; font-size: 12px; padding: 4px 8px; cursor: pointer; transition: background .15s;
+    white-space: nowrap;
+  }
+  .note-icon-btn:hover { background: rgba(0,123,127,.25); }
+
+  /* STAR */
+  .star-btn { background:none; border:none; cursor:pointer; font-size:16px; color:var(--muted); padding:0 2px; line-height:1; transition:color .15s,transform .15s; }
+  .star-btn:hover { color:var(--amber); transform:scale(1.2); }
+  .star-btn.starred { color:var(--amber); }
+
+  /* COUNTDOWN */
+  .countdown { display:inline-block; padding:2px 7px; border-radius:20px; font-size:10px; font-weight:700; margin-left:5px; white-space:nowrap; }
+  .countdown-today { background:rgba(239,68,68,.2);  color:#F87171; border:1px solid rgba(239,68,68,.35); }
+  .countdown-hot   { background:rgba(239,68,68,.12); color:#FCA5A5; border:1px solid rgba(239,68,68,.25); }
+  .countdown-warm  { background:rgba(245,158,11,.15);color:var(--amber); border:1px solid rgba(245,158,11,.25); }
+  .countdown-cool  { background:rgba(0,123,127,.12); color:var(--teal); border:1px solid rgba(0,123,127,.25); }
+
+  /* STARRED FILTER & IC PRINT */
+  .star-filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; font-family:inherit; }
+  .star-filter-btn:hover { border-color:var(--amber); color:var(--amber); }
+  .star-filter-btn.active { background:rgba(245,158,11,.15); border-color:var(--amber); color:var(--amber); }
+  .ic-print-btn { background:var(--teal2); color:#fff; border:none; font-size:11px; padding:7px 14px; border-radius:6px; cursor:pointer; font-family:inherit; font-weight:700; transition:opacity .2s; white-space:nowrap; }
+  .ic-print-btn:hover { opacity:.85; }
+  .ic-dropdown { position:relative; display:inline-block; }
+  .ic-dropdown-menu { position:absolute; right:0; top:calc(100% + 6px); background:var(--card); border:1px solid var(--border); border-radius:8px; min-width:200px; z-index:500; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,.5); display:none; }
+  .ic-dropdown-menu.open { display:block; }
+  .ic-dropdown-item { padding:10px 16px; font-size:12px; cursor:pointer; color:var(--text); transition:background .15s; border-bottom:1px solid rgba(38,54,96,.5); }
+  .ic-dropdown-item:last-child { border-bottom:none; }
+  .ic-dropdown-item:hover { background:var(--card2); color:var(--teal); }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    header { padding: 12px 16px; }
+    .filter-bar { padding: 10px 16px; gap: 8px; }
+    select { min-width: 100%; }
+    .filter-group { flex-direction: column; width: 100%; }
+    .filter-divider { display: none; }
+    main { padding: 14px 16px; gap: 14px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .kpi-row .kpi-card:last-child { grid-column: span 2; }
+    .charts-row { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .chart-wrap { min-height: 200px; }
+    .catalyst, .thesis, .col-updated { display: none; }
+    .company { display: none; }
+    .result-count { margin-left: 0; width: 100%; }
+    .mobile-cards { display: flex; flex-direction: column; gap: 10px; }
+    .mobile-card {
+      background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    }
+    .mc-top     { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .mc-ticker  { font-size: 16px; font-weight: 800; color: var(--teal); }
+    .mc-company { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .mc-badges  { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .mc-meta    { font-size: 11px; color: var(--muted); }
+    .mc-catalyst{ margin-top: 6px; font-size: 11px; color: var(--amber); }
+  }
+  @media (min-width: 769px) { .mobile-cards { display: none; } }
+  @media (max-width: 768px) { .table-card .table-wrap { display: none; } }
+
+  /* PASSWORD GATE (mobile-published copy only) */
+  .pw-gate {
+    position: fixed; inset: 0; z-index: 5000;
+    background: linear-gradient(135deg, var(--navy2) 0%, var(--navy) 60%, var(--bg) 100%);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .pw-gate.unlocked { display: none; }
+  .pw-box {
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 32px 28px; width: 100%; max-width: 320px; text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  }
+  .pw-brand { font-size: 20px; font-weight: 800; color: var(--teal); letter-spacing: 1px; }
+  .pw-sub { font-size: 11px; color: var(--muted); margin: 4px 0 22px; letter-spacing: .4px; }
+  .pw-input {
+    width: 100%; background: var(--card2); border: 1px solid var(--border); color: var(--text);
+    font-size: 15px; padding: 11px 14px; border-radius: 8px; text-align: center;
+    font-family: inherit; margin-bottom: 12px; box-sizing: border-box;
+  }
+  .pw-input:focus { outline: none; border-color: var(--teal); }
+  .pw-btn {
+    width: 100%; background: var(--teal2); color: #fff; border: none; padding: 11px;
+    border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .pw-btn:hover { opacity: .9; }
+  .pw-error { color: var(--short); font-size: 11px; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div id="pwGate" class="pw-gate">
+  <div class="pw-box">
+    <div class="pw-brand">RIPOSTE CAPITAL</div>
+    <div class="pw-sub">Research Command Center &middot; Mobile Access</div>
+    <input type="password" id="pwInput" class="pw-input" placeholder="Enter passcode" autocomplete="off" />
+    <button class="pw-btn" onclick="checkPasscode()">Unlock</button>
+    <div class="pw-error" id="pwError" style="display:none">Incorrect passcode &mdash; try again.</div>
+  </div>
+</div>
+<script>
+  // Simple client-side gate -- NOT real security (anyone who opens dev tools
+  // or view-source can see this script), just a deterrent against a leaked
+  // or guessed URL. To change the passcode: pick a new one, open a browser
+  // console on this page and run:
+  //   crypto.subtle.digest('SHA-256', new TextEncoder().encode('yourNewPasscode')).then(b=>console.log([...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')))
+  // then paste the printed hex string in place of PW_HASH below.
+  const PW_HASH = "7b1af9f667e1d8f25b18dacb75f5a2a789fb6eb9adc0f0775e453811902ac8ab"; // default passcode: RiposteRCC2026
+  const PW_STORAGE_KEY = "rcc_mobile_unlocked";
+
+  async function sha256Hex(str) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  async function checkPasscode() {
+    const val = document.getElementById('pwInput').value;
+    const hash = await sha256Hex(val);
+    if (hash === PW_HASH) {
+      localStorage.setItem(PW_STORAGE_KEY, PW_HASH);
+      document.getElementById('pwGate').classList.add('unlocked');
+    } else {
+      document.getElementById('pwError').style.display = 'block';
+    }
+  }
+  document.getElementById('pwInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') checkPasscode(); });
+  if (localStorage.getItem(PW_STORAGE_KEY) === PW_HASH) {
+    document.getElementById('pwGate').classList.add('unlocked');
+  }
+</script>
+
+<header>
+  <div class="logo-area">
+    <div class="logo-mark">
+      <svg viewBox="0 0 52 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M26 4 A20 20 0 1 1 6 24" stroke="#007B7F" stroke-width="5.5" stroke-linecap="round" fill="none"/>
+        <path d="M26 14 A12 12 0 1 0 14 26" stroke="#1A2B5B" stroke-width="4" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="brand">RIPOSTE</div>
+      <div class="sub">C &nbsp; A &nbsp; P &nbsp; I &nbsp; T &nbsp; A &nbsp; L</div>
+    </div>
+  </div>
+  <div class="header-right" style="display:flex;align-items:center;gap:16px">
+    <div>
+      <div class="title">Research Command Center</div>
+      <div class="date" id="hdrDate"></div>
+    </div>
+    <div class="ic-dropdown">
+      <button class="ic-print-btn" onclick="toggleICDropdown(event)">&#128438; IC Print &#9662;</button>
+      <div class="ic-dropdown-menu" id="icDropdownMenu">
+        <div class="ic-dropdown-item" onclick="printIC('starred')">&#9733;&nbsp; Favorites</div>
+        <div class="ic-dropdown-item" onclick="printIC('active')">&#9654;&nbsp; Active Only</div>
+        <div class="ic-dropdown-item" onclick="printIC('exclude-archived')">&#9675;&nbsp; All except Archived</div>
+        <div class="ic-dropdown-item" onclick="printIC('all')">&#9776;&nbsp; All Stocks</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="filter-bar">
+  <span class="filter-label">Filters</span>
+  <div class="filter-group">
+    <select id="fAnalyst"><option value="">All Analysts</option></select>
+    <select id="fSector"><option value="">All Sectors</option></select>
+    <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
+    <select id="fConviction"><option value="">All Conviction</option><option>High</option><option>Developing</option><option>Neutral</option><option>Declining</option></select>
+    <select id="fStatus"><option value="">All Statuses</option><option>Active</option><option>Idea Pipeline</option><option>Archived</option></select>
+  </div>
+  <div class="filter-divider"></div>
+  <button class="star-filter-btn" id="starFilterBtn" onclick="toggleStarFilter()">&#9733; Starred</button>
+  <button class="reset-btn" onclick="resetFilters()">Reset</button>
+  <span class="result-count" id="resultCount"></span>
+</div>
+
+<main>
+  <!-- KPI ROW -->
+  <div class="kpi-row">
+    <div class="kpi-card" style="--accent:#007B7F">
+      <div class="kpi-label">Total Picks</div>
+      <div class="kpi-value" id="kTotal">—</div>
+      <div class="kpi-sub">across all analysts</div>
+    </div>
+    <div class="kpi-card" style="--accent:#22C55E">
+      <div class="kpi-label">Active</div>
+      <div class="kpi-value" id="kActive" style="--kv:#22C55E">—</div>
+      <div class="kpi-sub">live positions</div>
+    </div>
+    <div class="kpi-card" style="--accent:#60A5FA">
+      <div class="kpi-label">Idea Pipeline</div>
+      <div class="kpi-value" id="kPipeline" style="--kv:#60A5FA">—</div>
+      <div class="kpi-sub">in research</div>
+    </div>
+    <div class="kpi-card" style="--accent:#22C55E">
+      <div class="kpi-label">Long</div>
+      <div class="kpi-value" id="kLong" style="--kv:#22C55E">—</div>
+      <div class="kpi-sub" id="kLongPct"></div>
+    </div>
+    <div class="kpi-card" style="--accent:#EF4444">
+      <div class="kpi-label">Short</div>
+      <div class="kpi-value" id="kShort" style="--kv:#EF4444">—</div>
+      <div class="kpi-sub" id="kShortPct"></div>
+    </div>
+  </div>
+
+  <!-- CHARTS ROW -->
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Picks by Sector</div>
+      <div class="chart-wrap"><canvas id="cSector"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Long / Short Split</div>
+      <div class="chart-wrap"><canvas id="cDirection"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Conviction Level</div>
+      <div class="chart-wrap"><canvas id="cConviction"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Status Breakdown</div>
+      <div class="chart-wrap"><canvas id="cStatus"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY + TABLE -->
+  <div class="bottom-row">
+
+    <!-- ACTIVITY FEED -->
+    <div class="activity-card">
+      <div class="activity-header">
+        <span class="title">&#128337; Recent Activity</span>
+        <span style="font-size:10px;color:var(--muted)" id="auditCount"></span>
+      </div>
+      <div class="activity-list" id="activityList"></div>
+    </div>
+
+    <!-- PICKS TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <span class="title">Stock Picks</span>
+        <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:32px;text-align:center;cursor:default">&#9733;</th>
+              <th onclick="sortBy('ticker')">Ticker <span class="sort-icon" id="si-ticker">▲</span></th>
+              <th onclick="sortBy('company')">Company <span class="sort-icon" id="si-company">▲</span></th>
+              <th onclick="sortBy('analyst')">Analyst <span class="sort-icon" id="si-analyst">▲</span></th>
+              <th onclick="sortBy('sector')">Sector <span class="sort-icon" id="si-sector">▲</span></th>
+              <th onclick="sortBy('direction')">Direction <span class="sort-icon" id="si-direction">▲</span></th>
+              <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">▲</span></th>
+              <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">▲</span></th>
+              <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">▲</span></th>
+              <th>Next Catalyst</th>
+              <th>Thesis</th>
+              <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
+              <th>Docs</th>
+              <th>PM Note</th>
+            </tr>
+          </thead>
+          <tbody id="picksBody"></tbody>
+        </table>
+      </div>
+      <div class="mobile-cards" id="mobileCards"></div>
+      <div class="empty" id="emptyMsg" style="display:none">No picks match the selected filters.</div>
+    </div>
+
+  </div>
+</main>
+
+<footer>Riposte Capital &nbsp;·&nbsp; Research Command Center &nbsp;·&nbsp; For internal use only</footer>
+
+<!-- PM NOTES MODAL -->
+<div class="modal-overlay" id="noteModal" onclick="handleOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">PM Note</span>
+      <button class="modal-close" onclick="closeNoteModal()">×</button>
+    </div>
+    <div class="modal-stock-info" id="modalStockInfo"></div>
+    <textarea class="note-textarea" id="noteText" placeholder="Type your feedback, questions, or action items for this pick…"></textarea>
+    <div class="modal-section-label">Send to analyst via</div>
+    <div class="modal-actions">
+      <button class="note-btn btn-teams" onclick="sendNoteTeams()">&#128172; Send via Teams</button>
+      <button class="note-btn btn-copy" id="copyBtn" onclick="copyNote()">&#128203; Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STOCKS = [
+  { ticker:"LOW", company:"Lowe's Companies Inc.", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"165", status:"Active", catalyst:"FOMC July 29 | HD Earnings Aug 18 | LOW Earnings Aug 19", thesis:"Stagnant Existing Home Sales; misguided M&A strategy", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LOW Presentation v.1.1.pptx?d=w3f3e06dce87d4ef38ca26d668bde1ac2&csf=1&web=1&e=OczqtZ", memo:"" },
+  { ticker:"LEN", company:"Lennar Corporation", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"High", target:"85", status:"Active", catalyst:"DHI Earnings July 21", thesis:"Housing Starts will disappoint; hits pace-over-price builder", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LEN Discussion November 2025 v.1.1.pptx?d=w94431703a6c74f04ba84dcae4cb2a4c6&csf=1&web=1&e=nzbMSD", memo:"" },
+  { ticker:"MS", company:"Morgan Stanley", analyst:"James Gildea", sector:"Financials", direction:"Long", conviction:"Developing", target:"250", status:"Idea Pipeline", catalyst:"JPM and GS earnings July 14; MS July 15", thesis:"Weath Management leader; better capital markets activity", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"H", company:"Hyatt Hotels Corporation", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"High", target:"48", status:"Idea Pipeline", catalyst:"HLT earns Jul 23; H earns July 30", thesis:"K Shape beneficiary; RevPar strenth; asset monetization", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"DRH", company:"DiamondRock Hospitality Co.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"High", target:"14.5", status:"Active", catalyst:"DRH earns July 30", thesis:"RevPAR tailwind; NAV discount w/ proof; possible takeout", date:"2026-07-01", link:"DRH v.1.1.pptx", memo:"" },
+  { ticker:"JHX", company:"James Hardie Industries", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"High", target:"35", status:"Active", catalyst:"JHX earns August 19; Index incl ?", thesis:"Secular share gainer; benifits of AZEK ongoing; index incl", date:"2026-07-01", link:"JHX Back Ground Slides v.1.2 (1).pptx", memo:"" },
+  { ticker:"VIK", company:"Viking Holdings Ltd", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"80", status:"Archived", catalyst:"VIK earns August 19", thesis:"Pure upper income North America; brand moat; stock expensive", date:"2026-07-01", link:"VIK Investment Case v.1.pptx", memo:"" },
+  { ticker:"WSM", company:"Williams-Sonoma Inc.", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"260", status:"Idea Pipeline", catalyst:"WSM earns August 29", thesis:"Consumer strength; Pottery Barn turnaround", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"VICI", company:"VICI Properties Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Short", conviction:"High", target:"15", status:"Idea Pipeline", catalyst:"GLPI earns July 24; VICI July 29", thesis:"CZR exposure; stretching on risky deals", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VICI_Short_Deck_v2.pptx?d=w3d2bc171da5d4eee9f41f3e1ced6ac54&csf=1&web=1&e=qhtaEX", memo:"" },
+  { ticker:"CCL", company:"Carnival Corporation", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"Developing", target:"105", status:"Archived", catalyst:"RCL earns July 29", thesis:"Inexpensive stock; leisure value proposition; headline risk", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"BX", company:"Blackstone Inc.", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"Developing", target:"85", status:"Idea Pipeline", catalyst:"BX earns July 23", thesis:"Too big to grow; private credit fear and AI disrupt fear", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"EG", company:"Everest Group Ltd.", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"Developing", target:"14", status:"Idea Pipeline", catalyst:"RNR earns July 23; ACGL July 28; EG Jul 30", thesis:"Sector pricing headwinds, weak player", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"JLL", company:"Jones Lang LaSalle Inc.", analyst:"James Gildea", sector:"Real Estate", direction:"Long", conviction:"Developing", target:"965", status:"Archived", catalyst:"CBRE earns July 29; JLL July 30", thesis:"CRE transaction volume recovery early innings; tagged as AI loser", date:"2026-07-01", link:"JLL Investment Case v.1.1 (1).pptx", memo:"" },
+  { ticker:"LPX", company:"Louisiana-Pacific Corporation", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"Developing", target:"84", status:"Idea Pipeline", catalyst:"LPX earns August 6", thesis:"Secular share gainer", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LPX_Company_Primer_v1.1.pptx?d=wa84506f0c7a54ca9b05ee9e48a692050&csf=1&web=1&e=UPHPuY", memo:"" },
+  { ticker:"QXO", company:"QXO Inc.", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"Developing", target:"30", status:"Active", catalyst:"Closing BLD acquistion end July", thesis:"Merger noise in stock subsides", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"CPNG", company:"Coupang", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"Neutral", target:"2", status:"Active", catalyst:"Earnings July 8", thesis:"", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"INDV", company:"Indivior", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Short", conviction:"High", target:"77", status:"Active", catalyst:"Check Earnings q3 July 3", thesis:"", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"" },
+  { ticker:"JPM", company:"JPMorgan Chase", analyst:"Kamaljit Gill", sector:"Financials", direction:"Long", conviction:"Developing", target:"66", status:"Idea Pipeline", catalyst:"Q2 Earnings July 11", thesis:"NII expansion in rising rate environment", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Indivior Investment Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=j23NAk", memo:"" },
+  { ticker:"PLD", company:"Prologis Inc.", analyst:"Kamaljit Gill", sector:"Real Estate", direction:"Long", conviction:"Developing", target:"234", status:"Idea Pipeline", catalyst:"Q2 Earnings July 8", thesis:"E-commerce tailwinds for industrial REIT", date:"2026-07-01", link:"", memo:"" },
+  { ticker:"NFLX", company:"Netflix Inc.", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Long", conviction:"Developing", target:"54", status:"Idea Pipeline", catalyst:"Q2 Earnings July 17", thesis:"Ad-supported tier driving ARPU expansion", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"AAPL", company:"Apple Inc.", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"High", target:"54", status:"Active", catalyst:"Q3 Earnings Oct 28", thesis:"AI supercycle driving iPhone upgrade cycle", date:"2026-06-26", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AAPL Investment Memo.docx?d=wcba3475bb97e4259910fb5f138de4656&csf=1&web=1&e=tnxiPS" },
+  { ticker:"AMZN", company:"Amazon.com Inc.", analyst:"Tehmur Jabbar", sector:"Consumer Discretionary", direction:"Short", conviction:"Developing", target:"18", status:"Active", catalyst:"AWS re:Invent Dec", thesis:"Capex cycle compressing FCF margins", date:"2026-06-29", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/AMZN Investment Memo.docx?d=w62a09702f2644eacb8276c6493f7f494&csf=1&web=1&e=7RXx7v" },
+  { ticker:"UNH", company:"UnitedHealth Group", analyst:"Tehmur Jabbar", sector:"Healthcare", direction:"Short", conviction:"Developing", target:"865", status:"Active", catalyst:"Q2 Earnings July 15", thesis:"MLR expansion risk underappreciated", date:"2026-06-26", link:"", memo:"" },
+  { ticker:"CAT", company:"Caterpillar Inc.", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"Developing", target:"23", status:"Archived", catalyst:"Q2 Earnings July 24", thesis:"Infrastructure spend beneficiary", date:"2026-06-26", link:"", memo:"" }
+];
+
+
+
+const AUDIT = [
+  { ts:"2026-07-01 13:22", user:"Youssef Ait Boulahri", ticker:"PLD", field:"Next Catalyst", oldVal:"Q2 Earnings July 16", newVal:"Q2 Earnings July 8" },
+  { ts:"2026-07-01 11:49", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Research Link", oldVal:"JLL Investment Case v.1.1 (1).pptx", newVal:"" },
+  { ts:"2026-07-01 11:49", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/LPX_Company_Primer_v1.1.pptx?d=wa84506f0c7a54ca9b05ee9e48a692050&csf=1&web=1&e=UPHPuY" },
+  { ts:"2026-07-01 11:48", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:48", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Research Link", oldVal:"LPX_Company_Primer_v1.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:48", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:48", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"LPX_Company_Primer_v1.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"LPX_Company_Primer_v1.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"LPX_Company_Primer_v1.1.pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Research Link", oldVal:"LPX_Company_Primer_v1.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"JLL", field:"Research Link", oldVal:"", newVal:"JLL Investment Case v.1.1 (1).pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"JLL Investment Case v.1.1 (1).pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"JLL", field:"Research Link", oldVal:"VICI_Short_Deck_v2.pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"LPX", field:"Research Link", oldVal:"", newVal:"JLL Investment Case v.1.1 (1).pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"WSM", field:"Research Link", oldVal:"JLL Investment Case v.1.1 (1).pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"VIK", field:"Research Link", oldVal:"", newVal:"VIK Investment Case v.1.pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"H", field:"Research Link", oldVal:"VIK Investment Case v.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"JHX", field:"Research Link", oldVal:"", newVal:"JHX Back Ground Slides v.1.2 (1).pptx" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"VIK", field:"Research Link", oldVal:"JHX Back Ground Slides v.1.2 (1).pptx", newVal:"" },
+  { ts:"2026-07-01 11:47", user:"Youssef Ait Boulahri", ticker:"H", field:"Research Link", oldVal:"", newVal:"VIK Investment Case v.1.pptx" },
+  { ts:"2026-07-01 11:46", user:"Youssef Ait Boulahri", ticker:"JHX", field:"Research Link", oldVal:"VIK Investment Case v.1.pptx", newVal:"" },
+  { ts:"2026-07-01 11:46", user:"Youssef Ait Boulahri", ticker:"VIK", field:"Research Link", oldVal:"", newVal:"JHX Back Ground Slides v.1.2 (1).pptx" },
+  { ts:"2026-07-01 11:46", user:"Youssef Ait Boulahri", ticker:"H", field:"Research Link", oldVal:"JHX Back Ground Slides v.1.2 (1).pptx", newVal:"" },
+  { ts:"2026-07-01 11:46", user:"Youssef Ait Boulahri", ticker:"DRH", field:"Research Link", oldVal:"", newVal:"DRH v.1.1.pptx" },
+  { ts:"2026-07-01 11:46", user:"Youssef Ait Boulahri", ticker:"MS", field:"Research Link", oldVal:"DRH v.1.1.pptx", newVal:"" },
+  { ts:"2026-07-01 10:35", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Conviction", oldVal:"Developing", newVal:"Neutral" },
+  { ts:"2026-07-01 10:35", user:"Youssef Ait Boulahri", ticker:"INDV", field:"Next Catalyst", oldVal:"Check Earnings q3 july 3", newVal:"Check Earnings q3 July 3" },
+  { ts:"2026-07-01 10:35", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Next Catalyst", oldVal:"Earnings july 8", newVal:"Earnings July 8" },
+  { ts:"2026-07-01 10:35", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Next Catalyst", oldVal:"7/8/2026", newVal:"Earnings july 8" },
+  { ts:"2026-07-01 10:21", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Next Catalyst", oldVal:"July 8th", newVal:"7/8/2026" },
+  { ts:"2026-07-01 10:21", user:"Youssef Ait Boulahri", ticker:"INDV", field:"Next Catalyst", oldVal:"Check Earnings q3", newVal:"Check Earnings q3 july 3" },
+  { ts:"2026-07-01 10:21", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Next Catalyst", oldVal:"", newVal:"July 8th" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Thesis / Notes", oldVal:"Merger noise in stock subsides", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Next Catalyst", oldVal:"Closing BLD acquistion end July", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Status", oldVal:"Active", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Target Price", oldVal:"30", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Conviction", oldVal:"Developing", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Direction", oldVal:"Long", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Sector", oldVal:"Housing", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Analyst", oldVal:"James Gildea", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Company Name", oldVal:"QXO Inc.", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"(new row)", field:"Ticker", oldVal:"QXO", newVal:"" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Thesis / Notes", oldVal:"", newVal:"Merger noise in stock subsides" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Next Catalyst", oldVal:"", newVal:"Closing BLD acquistion end July" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Status", oldVal:"", newVal:"Active" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Target Price", oldVal:"", newVal:"30" },
+  { ts:"2026-07-01 10:15", user:"Youssef Ait Boulahri", ticker:"QXO", field:"Conviction", oldVal:"", newVal:"Developing" }
+];
+
+
+
+// ── Stars ─────────────────────────────────────────────────────
+let showStarredOnly = false;
+
+function loadStars() {
+  try { return JSON.parse(localStorage.getItem('rcc_starred') || '{}'); }
+  catch(e) { return {}; }
+}
+function isStarred(ticker) { return !!loadStars()[ticker]; }
+function toggleStar(ticker) {
+  const stars = loadStars();
+  if (stars[ticker]) delete stars[ticker]; else stars[ticker] = true;
+  localStorage.setItem('rcc_starred', JSON.stringify(stars));
+  render();
+}
+function toggleStarFilter() {
+  showStarredOnly = !showStarredOnly;
+  document.getElementById('starFilterBtn').classList.toggle('active', showStarredOnly);
+  render();
+}
+
+// ── Catalyst Countdown ────────────────────────────────────────
+const MONTH_MAP = {
+  january:0,february:1,march:2,april:3,may:4,june:5,july:6,august:7,
+  september:8,october:9,november:10,december:11,
+  jan:0,feb:1,mar:2,apr:3,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11
+};
+
+function nextCatalystDate(str) {
+  if (!str) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  let nearest = null;
+  const re1 = /\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|oct|nov|dec)\s+(\d{1,2})\b/gi;
+  let m;
+  while ((m = re1.exec(str)) !== null) {
+    const mon = MONTH_MAP[m[1].toLowerCase()]; const day = parseInt(m[2]);
+    let d = new Date(today.getFullYear(), mon, day);
+    if (d < today) d.setFullYear(d.getFullYear() + 1);
+    if (!nearest || d < nearest) nearest = d;
+  }
+  const re2 = /\b(\d{1,2})\/(\d{1,2})\b/g;
+  while ((m = re2.exec(str)) !== null) {
+    const mon = parseInt(m[1]) - 1, day = parseInt(m[2]);
+    let d = new Date(today.getFullYear(), mon, day);
+    if (d < today) d.setFullYear(d.getFullYear() + 1);
+    if (!nearest || d < nearest) nearest = d;
+  }
+  return nearest;
+}
+
+function countdownBadge(catalystStr) {
+  const d = nextCatalystDate(catalystStr);
+  if (!d) return '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((d - today) / 86400000);
+  if (days < 0) return '';
+  if (days === 0) return '<span class="countdown countdown-today">Today</span>';
+  const cls = days <= 7 ? 'countdown-hot' : days <= 14 ? 'countdown-warm' : 'countdown-cool';
+  return `<span class="countdown ${cls}">${days}d</span>`;
+}
+
+// ── IC Print View ─────────────────────────────────────────────
+function toggleICDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('icDropdownMenu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('icDropdownMenu');
+  if (m) m.classList.remove('open');
+});
+
+function printIC(mode) {
+  document.getElementById('icDropdownMenu').classList.remove('open');
+
+  let data, title;
+  if (mode === 'starred') {
+    const stars = loadStars();
+    data = STOCKS.filter(r => stars[r.ticker]);
+    title = 'Favorites — IC Sheet';
+    if (!data.length) { alert('No starred picks yet. Use the ★ column to star picks first.'); return; }
+  } else if (mode === 'active') {
+    data = STOCKS.filter(r => r.status === 'Active');
+    title = 'Active Picks — IC Sheet';
+  } else if (mode === 'exclude-archived') {
+    data = STOCKS.filter(r => r.status !== 'Archived');
+    title = 'Active & Pipeline — IC Sheet';
+  } else {
+    data = [...STOCKS];
+    title = 'All Picks — IC Sheet';
+  }
+  const subtitle = `${data.length} pick${data.length !== 1 ? 's' : ''} · ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+
+  const rows = data.map(r => {
+    const d = nextCatalystDate(r.catalyst);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const days = d ? Math.round((d - today) / 86400000) : null;
+    const daysHtml = (days !== null && days >= 0)
+      ? `<span style="background:#E0F2FE;color:#0369A1;padding:1px 6px;border-radius:10px;font-size:10px;font-weight:700;margin-left:5px">${days === 0 ? 'Today' : days + 'd'}</span>` : '';
+    const dirColor = r.direction === 'Long' ? '#16A34A' : r.direction === 'Short' ? '#DC2626' : '#64748B';
+    const thesisCell = r.thesis ? (r.memo ? `<a href="${r.memo}" style="color:#007B7F;text-decoration:none;border-bottom:1px dashed #007B7F">${r.thesis}</a>` : r.thesis) : '—';
+    return `<tr>
+      <td style="font-weight:900;color:#007B7F;font-size:14px;white-space:nowrap">${r.ticker}</td>
+      <td>${r.company}</td>
+      <td style="color:${dirColor};font-weight:700;white-space:nowrap">${r.direction||'—'}</td>
+      <td style="white-space:nowrap">${r.conviction||'—'}</td>
+      <td style="font-weight:700;white-space:nowrap">${r.target ? '$' + parseFloat(r.target).toFixed(2) : '—'}</td>
+      <td style="max-width:260px;font-size:11px;color:#334155">${thesisCell}</td>
+      <td style="font-size:11px;color:#475569">${r.catalyst||'—'}${daysHtml}</td>
+      <td style="font-size:11px;color:#64748B;white-space:nowrap">${r.analyst}</td>
+    </tr>`;
+  }).join('');
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8"/><title>Riposte Capital — IC Sheet</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Arial,sans-serif;color:#1E293B;background:#fff;padding:32px 40px}
+  .ic-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;border-bottom:3px solid #007B7F;padding-bottom:16px}
+  .ic-brand{font-size:22px;font-weight:900;color:#007B7F;letter-spacing:1px}
+  .ic-brand-sub{font-size:10px;letter-spacing:3px;color:#94A3B8;margin-top:2px}
+  .ic-meta{text-align:right;font-size:12px;color:#94A3B8}
+  .ic-meta strong{display:block;font-size:15px;color:#1E293B;font-weight:800;margin-bottom:2px}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{background:#1A2B5B;color:#fff;padding:9px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.6px;white-space:nowrap}
+  tbody tr{border-bottom:1px solid #E2E8F0}
+  tbody tr:nth-child(even){background:#F8FAFC}
+  tbody td{padding:9px 12px;vertical-align:top}
+  .btn-row{display:flex;gap:10px;margin-bottom:20px}
+  .btn{padding:8px 18px;border-radius:6px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-print{background:#007B7F;color:#fff}
+  .btn-close{background:#E2E8F0;color:#1E293B}
+  .ic-footer{margin-top:24px;font-size:10px;color:#94A3B8;text-align:center;border-top:1px solid #E2E8F0;padding-top:12px}
+  @media print{.btn-row{display:none}body{padding:16px}}
+</style>
+</head><body>
+<div class="btn-row">
+  <button class="btn btn-print" onclick="window.print()">&#128438; Print</button>
+  <button class="btn btn-close" onclick="window.close()">&#10005; Close</button>
+</div>
+<div class="ic-header">
+  <div><div class="ic-brand">RIPOSTE CAPITAL</div><div class="ic-brand-sub">R &nbsp;E &nbsp;S &nbsp;E &nbsp;A &nbsp;R &nbsp;C &nbsp;H</div></div>
+  <div class="ic-meta"><strong>${title}</strong>${subtitle}</div>
+</div>
+<table>
+  <thead><tr><th>Ticker</th><th>Company</th><th>Dir.</th><th>Conviction</th><th>Target</th><th>Thesis</th><th>Next Catalyst</th><th>Analyst</th></tr></thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="ic-footer">Riposte Capital &nbsp;·&nbsp; Research Command Center &nbsp;·&nbsp; Confidential &nbsp;·&nbsp; Internal Use Only</div>
+</body></html>`);
+  win.document.close();
+}
+
+// ── Sort state ────────────────────────────────────────────────
+let sortKey = 'date', sortDir = -1;
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  const si = document.getElementById('si-' + key);
+  if (si) {
+    si.closest('th').classList.add('sorted');
+    si.textContent = sortDir === 1 ? '▲' : '▼';
+  }
+  render();
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function unique(arr, key) { return [...new Set(arr.map(d => d[key]).filter(Boolean))].sort(); }
+
+function badge(val) {
+  if (!val) return '<span class="badge-none">—</span>';
+  const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', High:'high', Developing:'developing', Neutral:'neutral', Declining:'declining', Medium:'med', Low:'low' };
+  return `<span class="badge badge-${map[val]||''}">${val}</span>`;
+}
+
+function isStale(dateStr) {
+  if (!dateStr) return false;
+  const d = new Date(dateStr);
+  return (Date.now() - d.getTime()) > 30 * 24 * 60 * 60 * 1000;
+}
+
+function timeAgo(tsStr) {
+  if (!tsStr) return '';
+  const d = new Date(tsStr.replace(' ', 'T'));
+  if (isNaN(d)) return tsStr;
+  const mins = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (mins < 1)   return 'just now';
+  if (mins < 60)  return `${mins}m ago`;
+  if (mins < 1440)return `${Math.floor(mins/60)}h ago`;
+  return `${Math.floor(mins/1440)}d ago`;
+}
+
+// ── Filters ───────────────────────────────────────────────────
+function getFiltered() {
+  const a  = document.getElementById('fAnalyst').value;
+  const s  = document.getElementById('fSector').value;
+  const d  = document.getElementById('fDirection').value;
+  const c  = document.getElementById('fConviction').value;
+  const st = document.getElementById('fStatus').value;
+  const q  = (document.getElementById('searchBox').value || '').toLowerCase();
+  return STOCKS.filter(r =>
+    (!showStarredOnly || isStarred(r.ticker)) &&
+    (!a  || r.analyst    === a)  &&
+    (!s  || r.sector     === s)  &&
+    (!d  || r.direction  === d)  &&
+    (!c  || r.conviction === c)  &&
+    (!st || r.status     === st) &&
+    (!q  || r.ticker.toLowerCase().includes(q) || r.company.toLowerCase().includes(q))
+  ).sort((a, b) => {
+    const av = (a[sortKey] || '').toString().toLowerCase();
+    const bv = (b[sortKey] || '').toString().toLowerCase();
+    return av < bv ? -sortDir : av > bv ? sortDir : 0;
+  });
+}
+
+function count(arr, key, val) { return arr.filter(r => r[key] === val).length; }
+
+// ── KPIs ──────────────────────────────────────────────────────
+function updateKPIs(data) {
+  const withDir = data.filter(r => r.direction);
+  document.getElementById('kTotal').textContent    = data.length;
+  document.getElementById('kActive').textContent   = count(data,'status','Active');
+  document.getElementById('kPipeline').textContent = count(data,'status','Idea Pipeline');
+  const longs = count(data,'direction','Long'), shorts = count(data,'direction','Short');
+  document.getElementById('kLong').textContent  = longs;
+  document.getElementById('kShort').textContent = shorts;
+  const pct = n => withDir.length ? Math.round(n/withDir.length*100)+'% of directional' : '';
+  document.getElementById('kLongPct').textContent  = pct(longs);
+  document.getElementById('kShortPct').textContent = pct(shorts);
+  document.getElementById('resultCount').textContent = `${data.length} of ${STOCKS.length} picks`;
+}
+
+// ── Charts ────────────────────────────────────────────────────
+let charts = {};
+function destroyChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+const DOUGHNUT = {
+  plugins: { legend: { display:true, position:'bottom', labels:{ color:'#8A9CC8', font:{size:10}, padding:10, boxWidth:10 } } },
+  maintainAspectRatio: false, animation:{duration:400}, cutout:'65%'
+};
+
+function updateCharts(data) {
+  destroyChart('sector');
+  const sectors = unique(STOCKS,'sector');
+  charts['sector'] = new Chart(document.getElementById('cSector'), {
+    type: 'bar',
+    data: {
+      labels: sectors,
+      datasets: [
+        { label:'Long',  data: sectors.map(s=>count(data.filter(r=>r.direction==='Long'),'sector',s)),  backgroundColor:'rgba(34,197,94,.7)',   borderRadius:3 },
+        { label:'Short', data: sectors.map(s=>count(data.filter(r=>r.direction==='Short'),'sector',s)), backgroundColor:'rgba(239,68,68,.7)',   borderRadius:3 },
+        { label:'N/D',   data: sectors.map(s=>count(data.filter(r=>!r.direction),'sector',s)),          backgroundColor:'rgba(138,156,200,.3)', borderRadius:3 },
+      ]
+    },
+    options: {
+      plugins: { legend:{ display:true, position:'top', labels:{color:'#8A9CC8',font:{size:10},boxWidth:10,padding:8} } },
+      scales: {
+        x: { stacked:true, ticks:{color:'#8A9CC8',font:{size:9}}, grid:{color:'rgba(38,54,96,.5)'} },
+        y: { stacked:true, ticks:{color:'#8A9CC8',font:{size:9},stepSize:1}, grid:{color:'rgba(38,54,96,.5)'} }
+      },
+      maintainAspectRatio: false, animation:{duration:400}
+    }
+  });
+
+  const mkDonut = (id, key, labels, colors) => {
+    destroyChart(id);
+    charts[id] = new Chart(document.getElementById(id), {
+      type:'doughnut',
+      data:{ labels, datasets:[{ data:labels.map(l=>count(data,key,l)||data.filter(r=>!r[key]).length*(l===''?1:0)), backgroundColor:colors, borderWidth:1, borderColor:'#162040' }] },
+      options: DOUGHNUT
+    });
+  };
+
+  destroyChart('dir');
+  charts['dir'] = new Chart(document.getElementById('cDirection'),{
+    type:'doughnut',
+    data:{ labels:['Long','Short','No Dir'], datasets:[{ data:[count(data,'direction','Long'),count(data,'direction','Short'),data.filter(r=>!r.direction).length], backgroundColor:['rgba(34,197,94,.8)','rgba(239,68,68,.8)','rgba(138,156,200,.3)'], borderWidth:1, borderColor:'#162040' }] },
+    options: DOUGHNUT
+  });
+
+  destroyChart('conv');
+  charts['conv'] = new Chart(document.getElementById('cConviction'),{
+    type:'doughnut',
+    data:{ labels:['High','Developing','Neutral','Declining','Unset'], datasets:[{ data:[count(data,'conviction','High'),count(data,'conviction','Developing'),count(data,'conviction','Neutral'),count(data,'conviction','Declining'),data.filter(r=>!r.conviction).length], backgroundColor:['rgba(96,165,250,.8)','rgba(167,139,250,.8)','rgba(148,163,184,.8)','rgba(251,146,60,.8)','rgba(38,54,96,.5)'], borderWidth:1, borderColor:'#162040' }] },
+    options: DOUGHNUT
+  });
+
+  destroyChart('stat');
+  charts['stat'] = new Chart(document.getElementById('cStatus'),{
+    type:'doughnut',
+    data:{ labels:['Active','Idea Pipeline','Archived'], datasets:[{ data:['Active','Idea Pipeline','Archived'].map(v=>count(data,'status',v)), backgroundColor:['rgba(34,197,94,.8)','rgba(96,165,250,.8)','rgba(107,114,128,.5)'], borderWidth:1, borderColor:'#162040' }] },
+    options: DOUGHNUT
+  });
+}
+
+// ── Activity Feed ─────────────────────────────────────────────
+function renderActivity() {
+  const list = document.getElementById('activityList');
+  document.getElementById('auditCount').textContent = AUDIT.length ? `${AUDIT.length} entries` : '';
+
+  if (!AUDIT.length) {
+    list.innerHTML = '<div class="activity-empty">No activity logged yet.<br>Changes will appear here after the macro runs.</div>';
+    return;
+  }
+
+  list.innerHTML = AUDIT.map(a => `
+    <div class="activity-item">
+      <div class="ai-top">
+        <span class="ai-ticker">${a.ticker}</span>
+        <span class="ai-field">${a.field}</span>
+      </div>
+      <div class="ai-change">
+        ${a.oldVal ? `<span class="ai-old">${a.oldVal}</span><span class="ai-arrow">→</span>` : ''}
+        <span class="ai-new">${a.newVal || '—'}</span>
+      </div>
+      <div class="ai-meta">${a.user} &nbsp;·&nbsp; ${timeAgo(a.ts)}</div>
+    </div>
+  `).join('');
+}
+
+// ── Table ─────────────────────────────────────────────────────
+function updateTable(data) {
+  const tbody  = document.getElementById('picksBody');
+  const mobile = document.getElementById('mobileCards');
+  const empty  = document.getElementById('emptyMsg');
+  tbody.innerHTML = '';
+  mobile.innerHTML = '';
+  if (!data.length) { empty.style.display='block'; return; }
+  empty.style.display = 'none';
+
+  data.forEach(r => {
+    const stale = isStale(r.date) ? '<span class="stale-badge" title="Not updated in 30+ days"></span>' : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'★':'☆'}</button></td>
+      <td class="ticker">${r.ticker}</td>
+      <td class="company">${r.company}</td>
+      <td>${r.analyst}</td>
+      <td>${r.sector||'<span class="badge-none">—</span>'}</td>
+      <td>${badge(r.direction)}</td>
+      <td>${badge(r.conviction)}</td>
+      <td class="target-price">${r.target ? '$' + parseFloat(r.target).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '<span class="badge-none">—</span>'}</td>
+      <td>${badge(r.status)}</td>
+      <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
+      <td class="thesis" title="${r.thesis}">${r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">—</span>'}</td>
+      <td class="col-updated">${r.date}${stale}</td>
+      <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">—</span>'}</td>
+      <td><button class="note-icon-btn" onclick="openNoteModal('${r.ticker}')">&#128172; Note</button></td>
+    `;
+    tbody.appendChild(tr);
+
+    const card = document.createElement('div');
+    card.className = 'mobile-card';
+    card.innerHTML = `
+      <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
+      <div class="mc-company">${r.company}</div>
+      <div class="mc-badges">${badge(r.direction)}${r.conviction?badge(r.conviction):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
+      ${r.catalyst?`<div class="mc-catalyst">⚡ ${r.catalyst}</div>`:''}
+      ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
+      ${r.link?`<div style="margin-top:8px"><a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View Research</a></div>`:''}
+    `;
+    mobile.appendChild(card);
+  });
+}
+
+// ── Main render ───────────────────────────────────────────────
+function render() {
+  const data = getFiltered();
+  updateKPIs(data);
+  updateCharts(data);
+  updateTable(data);
+}
+
+function resetFilters() {
+  ['fAnalyst','fSector','fDirection','fConviction','fStatus'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('searchBox').value='';
+  showStarredOnly = false;
+  document.getElementById('starFilterBtn').classList.remove('active');
+  render();
+}
+
+function populateFilters() {
+  unique(STOCKS,'analyst').forEach(v => document.getElementById('fAnalyst').append(new Option(v,v)));
+  unique(STOCKS,'sector').forEach(v  => document.getElementById('fSector').append(new Option(v,v)));
+}
+
+// ── Analyst email map ─────────────────────────────────────────
+const ANALYST_EMAILS = {
+  'James Gildea':  'james.gildea@ripostecapital.com',
+  'Tehmur Jabbar': 'tehmur.jabbar@ripostecapital.com',
+  'Kamaljit Gill': 'kjg@ripostecapital.com'
+};
+
+// ── PM Note Modal ─────────────────────────────────────────────
+let currentNote = {};
+
+function openNoteModal(ticker) {
+  const r = STOCKS.find(s => s.ticker === ticker);
+  if (!r) return;
+  currentNote = r;
+  document.getElementById('modalTitle').textContent = `PM Note — ${r.ticker}`;
+  document.getElementById('modalStockInfo').innerHTML =
+    `<strong style="color:var(--teal);font-size:13px">${r.ticker}</strong>
+     <span>${r.company}</span>
+     <span style="color:var(--border)">·</span>
+     <span>${r.analyst}</span>
+     ${r.direction ? `<span style="color:var(--border)">·</span>${badge(r.direction)}` : ''}`;
+  document.getElementById('noteText').value = '';
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = '📋 Copy';
+  btn.classList.remove('copied');
+  document.getElementById('noteModal').classList.add('open');
+  setTimeout(() => document.getElementById('noteText').focus(), 50);
+}
+
+function closeNoteModal() {
+  document.getElementById('noteModal').classList.remove('open');
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('noteModal')) closeNoteModal();
+}
+
+function sendNoteTeams() {
+  const note = document.getElementById('noteText').value.trim();
+  if (!note) { document.getElementById('noteText').focus(); return; }
+  const r = currentNote;
+  const email = ANALYST_EMAILS[r.analyst];
+  if (!email) { alert(`No Teams email on file for ${r.analyst}.`); return; }
+  const msg = `PM Note — ${r.ticker} (${r.company})\n\n${note}\n\n— Research Command Center`;
+  window.open(`https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(email)}&message=${encodeURIComponent(msg)}`, '_blank');
+  closeNoteModal();
+}
+
+function copyNote() {
+  const note = document.getElementById('noteText').value.trim();
+  if (!note) { document.getElementById('noteText').focus(); return; }
+  const r = currentNote;
+  const text = `PM Note — ${r.ticker} (${r.company})\nAnalyst: ${r.analyst}\n\n${note}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── Init ──────────────────────────────────────────────────────
+document.getElementById('hdrDate').textContent =
+  new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+populateFilters();
+renderActivity();
+render();
+
+['fAnalyst','fSector','fDirection','fConviction','fStatus'].forEach(id =>
+  document.getElementById(id).addEventListener('change', render)
+);
+</script>
+</body>
+</html>
