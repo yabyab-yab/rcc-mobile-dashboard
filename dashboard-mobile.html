@@ -21,12 +21,12 @@
     --short:  #EF4444;
     --amber:  #F59E0B;
     --gray:   #6B7280;
-    --high:       #60A5FA;
-    --developing: #A78BFA;
-    --neutral:    #94A3B8;
-    --declining:  #FB923C;
-    --med:        #FBBF24;
-    --low:        #9CA3AF;
+    --c5: #22C55E;
+    --c4: #60A5FA;
+    --c3: #A78BFA;
+    --c2: #FBBF24;
+    --c1: #FB923C;
+    --c0: #6B7280;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -160,12 +160,12 @@
   .badge-active   { background: rgba(34,197,94,.12);  color: var(--long);  border: 1px solid rgba(34,197,94,.2); }
   .badge-pipeline { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
   .badge-archived { background: rgba(107,114,128,.12);color: var(--gray);  border: 1px solid rgba(107,114,128,.2); }
-  .badge-high       { background: rgba(96,165,250,.12);  color: var(--high);       border: 1px solid rgba(96,165,250,.2); }
-  .badge-developing { background: rgba(167,139,250,.12); color: var(--developing); border: 1px solid rgba(167,139,250,.2); }
-  .badge-neutral    { background: rgba(148,163,184,.12); color: var(--neutral);    border: 1px solid rgba(148,163,184,.2); }
-  .badge-declining  { background: rgba(251,146,60,.12);  color: var(--declining);  border: 1px solid rgba(251,146,60,.2); }
-  .badge-med        { background: rgba(251,191,36,.12);  color: var(--med);        border: 1px solid rgba(251,191,36,.2); }
-  .badge-low        { background: rgba(156,163,175,.12); color: var(--low);        border: 1px solid rgba(156,163,175,.2); }
+  .badge-c5 { background: rgba(34,197,94,.15);   color: var(--c5); border: 1px solid rgba(34,197,94,.3); }
+  .badge-c4 { background: rgba(96,165,250,.12);  color: var(--c4); border: 1px solid rgba(96,165,250,.2); }
+  .badge-c3 { background: rgba(167,139,250,.12); color: var(--c3); border: 1px solid rgba(167,139,250,.2); }
+  .badge-c2 { background: rgba(251,191,36,.12);  color: var(--c2); border: 1px solid rgba(251,191,36,.2); }
+  .badge-c1 { background: rgba(251,146,60,.12);  color: var(--c1); border: 1px solid rgba(251,146,60,.2); }
+  .badge-c0 { background: rgba(107,114,128,.12); color: var(--c0); border: 1px solid rgba(107,114,128,.2); }
   .badge-none     { color: var(--muted); font-size: 11px; }
   .catalyst { max-width: 200px; color: var(--muted); font-size: 11px; }
   .thesis   { max-width: 240px; color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -425,8 +425,9 @@
       <select id="fAnalyst"><option value="">All Analysts</option></select>
       <select id="fSector"><option value="">All Sectors</option></select>
       <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
-      <select id="fConviction"><option value="">All Conviction</option><option>High</option><option>Developing</option><option>Neutral</option><option>Declining</option></select>
+      <select id="fConviction"><option value="">All Conviction</option><option value="5">5 – Highest</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1 – Lowest</option><option value="0">0 – Archived</option></select>
       <select id="fStatus"><option value="">All Statuses</option><option>Active</option><option>Idea Pipeline</option><option>Archived</option></select>
+      <select id="fCatalyst"><option value="">All Catalysts</option><option value="today">Catalyst Today</option><option value="week">Catalyst This Week</option><option value="month">Catalyst This Month</option></select>
     </div>
     <div class="filter-divider"></div>
     <button class="star-filter-btn" id="starFilterBtn" onclick="toggleStarFilter()">&#9733; Starred</button>
@@ -596,22 +597,6 @@ const STOCKS = [
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const AUDIT = [
   { ts:"2026-07-08 08:37", user:"Tehmur Jabbar", ticker:"PCAR", field:"Thesis / Notes", oldVal:"", newVal:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside" },
   { ts:"2026-07-08 08:36", user:"Tehmur Jabbar", ticker:"PCAR", field:"Next Catalyst", oldVal:"", newVal:"EPA will release new engine rules, July '26" },
@@ -664,22 +649,6 @@ const AUDIT = [
   { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
   { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Company Name", oldVal:"", newVal:"Ncino" }
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -742,6 +711,19 @@ function countdownBadge(catalystStr) {
   if (days === 0) return '<span class="countdown countdown-today">Today</span>';
   const cls = days <= 7 ? 'countdown-hot' : days <= 14 ? 'countdown-warm' : 'countdown-cool';
   return `<span class="countdown ${cls}">${days}d</span>`;
+}
+
+function catalystInBucket(catalystStr, bucket) {
+  if (!bucket) return true;
+  const d = nextCatalystDate(catalystStr);
+  if (!d) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const days = Math.round((d - today) / 86400000);
+  if (days < 0) return false;
+  if (bucket === 'today') return days === 0;
+  if (bucket === 'week')  return days <= 7;
+  if (bucket === 'month') return days <= 30;
+  return true;
 }
 
 // ── IC Print View ─────────────────────────────────────────────
@@ -856,7 +838,7 @@ function unique(arr, key) { return [...new Set(arr.map(d => d[key]).filter(Boole
 
 function badge(val) {
   if (!val) return '<span class="badge-none">—</span>';
-  const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', High:'high', Developing:'developing', Neutral:'neutral', Declining:'declining', Medium:'med', Low:'low' };
+  const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', 5:'c5', 4:'c4', 3:'c3', 2:'c2', 1:'c1', 0:'c0' };
   return `<span class="badge badge-${map[val]||''}">${val}</span>`;
 }
 
@@ -884,6 +866,7 @@ function getFiltered() {
   const d  = document.getElementById('fDirection').value;
   const c  = document.getElementById('fConviction').value;
   const st = document.getElementById('fStatus').value;
+  const cat = document.getElementById('fCatalyst').value;
   const q  = (document.getElementById('searchBox').value || '').toLowerCase();
   return STOCKS.filter(r =>
     (!showStarredOnly || isStarred(r.ticker)) &&
@@ -892,6 +875,7 @@ function getFiltered() {
     (!d  || r.direction  === d)  &&
     (!c  || r.conviction === c)  &&
     (!st || r.status     === st) &&
+    catalystInBucket(r.catalyst, cat) &&
     (!q  || r.ticker.toLowerCase().includes(q) || r.company.toLowerCase().includes(q))
   ).sort((a, b) => {
     const av = (a[sortKey] || '').toString().toLowerCase();
@@ -968,7 +952,7 @@ function updateCharts(data) {
   destroyChart('conv');
   charts['conv'] = new Chart(document.getElementById('cConviction'),{
     type:'doughnut',
-    data:{ labels:['High','Developing','Neutral','Declining','Unset'], datasets:[{ data:[count(data,'conviction','High'),count(data,'conviction','Developing'),count(data,'conviction','Neutral'),count(data,'conviction','Declining'),data.filter(r=>!r.conviction).length], backgroundColor:['rgba(96,165,250,.8)','rgba(167,139,250,.8)','rgba(148,163,184,.8)','rgba(251,146,60,.8)','rgba(38,54,96,.5)'], borderWidth:1, borderColor:'#162040' }] },
+    data:{ labels:['5','4','3','2','1','0 (Archived)','Unset'], datasets:[{ data:[count(data,'conviction','5'),count(data,'conviction','4'),count(data,'conviction','3'),count(data,'conviction','2'),count(data,'conviction','1'),count(data,'conviction','0'),data.filter(r=>!r.conviction).length], backgroundColor:['rgba(34,197,94,.8)','rgba(96,165,250,.8)','rgba(167,139,250,.8)','rgba(251,191,36,.8)','rgba(251,146,60,.8)','rgba(107,114,128,.8)','rgba(38,54,96,.5)'], borderWidth:1, borderColor:'#162040' }] },
     options: DOUGHNUT
   });
 
@@ -1059,7 +1043,7 @@ function render() {
 }
 
 function resetFilters() {
-  ['fAnalyst','fSector','fDirection','fConviction','fStatus'].forEach(id => document.getElementById(id).value='');
+  ['fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id => document.getElementById(id).value='');
   document.getElementById('searchBox').value='';
   showStarredOnly = false;
   document.getElementById('starFilterBtn').classList.remove('active');
@@ -1162,7 +1146,7 @@ populateFilters();
 renderActivity();
 render();
 
-['fAnalyst','fSector','fDirection','fConviction','fStatus'].forEach(id =>
+['fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id =>
   document.getElementById(id).addEventListener('change', render)
 );
 </script>
