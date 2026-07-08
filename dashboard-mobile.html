@@ -576,8 +576,9 @@ const STOCKS = [
   { ticker:"INDV", company:"Indivior", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Long", conviction:"High", target:"50", status:"Archived", catalyst:"Check Earnings q3 July 3", thesis:"Self help + shareholder friendly capital deployment", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"" },
   { ticker:"ATZ", company:"Aritzia", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"High", target:"70", status:"Active", catalyst:"Q2 Earnings July 12", thesis:"High brand heat, unit growth story, GLP-1 demand upside", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/ATZ (2026.05.01).pptx?d=w46a4707ca5764c328afddc9c3e1a02f3&csf=1&web=1&e=9klcGT", memo:"" },
   { ticker:"RACE", company:"Ferrari NV", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"High", target:"430", status:"Active", catalyst:"Q2 Earnings July 8", thesis:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Race Investment Case June 2026.docx?d=w342cc5ab68e240a09ce08cb064739a01&csf=1&web=1&e=EEaSv4", memo:"" },
-  { ticker:"CMCSA", company:"Comcast", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Long", conviction:"High", target:"54", status:"Active", catalyst:"", thesis:"Starlink broaband disruption thesis", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"" },
-  { ticker:"T", company:"AT&T", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Long", conviction:"High", target:"15", status:"Active", catalyst:"", thesis:"Starlink broaband disruption thesis", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"" },
+  { ticker:"CMCSA", company:"Comcast", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"High", target:"15", status:"Active", catalyst:"", thesis:"Starlink broaband disruption thesis", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"" },
+  { ticker:"T", company:"AT&T", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"High", target:"15", status:"Active", catalyst:"", thesis:"Starlink broaband disruption thesis", date:"2026-07-07", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"" },
+  { ticker:"NCNO", company:"Ncino", analyst:"Kamaljit Gill", sector:"Information Technology", direction:"Long", conviction:"Developing", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Revenue growth acceleration - organic + new AI product", date:"2026-07-07", link:"", memo:"" },
   { ticker:"DSV DC", company:"DSV A/S", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"High", target:"3000", status:"Active", catalyst:"Beat-and-raise cadence resumes Q2/Q3, buyback H2", thesis:"Synergies, AI winner, buyback potential 40% of mkt cap. 15 '30 EBIT +35% above cons", date:"2026-07-02", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/DSV Investment Case July 2024.docx?d=wf1dcd48b9bf74050bb4e2c9fe45d8d2b&csf=1&web=1&e=vPD3p6", memo:"" },
   { ticker:"ENS", company:"EnerSys", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"High", target:"400", status:"Active", catalyst:"Q2/Q3 earnings, hyperscaler announcement H2'26 of early '27", thesis:"5% mkt shr of Lithium batteries for DC, 20x $20 of EPS", date:"2026-07-02", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EnerSys Investment Case May 2026.docx?d=w08e7d915d6b343729effcf12caf7b092&csf=1&web=1&e=3zbxaf", memo:"" },
   { ticker:"SPOT", company:"Spotify Technology", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"High", target:"1000", status:"Active", catalyst:"EBIT upside Q2/Q3", thesis:"Solid cash compounder, not AI-loser, 40% gross margins vs cons 35%, 30x EBITDA", date:"2026-07-02", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Spotify update June 2026.docx?d=wadb2471b24e9458ebec8bb90cb25c70e&csf=1&web=1&e=JNZKxe", memo:"" },
@@ -602,7 +603,19 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue growth acceleration - organic + AI", newVal:"Revenue growth acceleration - organic + new AI product" },
+  { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue acceleration -", newVal:"Revenue growth acceleration - organic + AI" },
+  { ts:"2026-07-07 21:21", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Self help + shareholder friendly capital deployment", newVal:"Revenue acceleration -" },
+  { ts:"2026-07-07 21:21", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"", newVal:"Self help + shareholder friendly capital deployment" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Conviction", oldVal:"", newVal:"Developing" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Direction", oldVal:"", newVal:"Long" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Sector", oldVal:"", newVal:"Information Technology" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Company Name", oldVal:"", newVal:"Ncino" },
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Ticker", oldVal:"", newVal:"NCNO" },
   { ts:"2026-07-07 16:25", user:"Kamaljit Gill", ticker:"RACE", field:"Target Price", oldVal:"234", newVal:"430" },
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"T", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" },
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"CMCSA", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" },
@@ -641,19 +654,9 @@ const AUDIT = [
   { ts:"2026-07-07 15:55", user:"Kamaljit Gill", ticker:"ATZ", field:"Research Link", oldVal:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/Indivior%20Investment%20Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=j23NAk", newVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/ATZ%20(2026.05.01).pptx?d=w46a4707ca5764c328afddc9c3e1a02f3&csf=1&web=1&e=9klcGT" },
   { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Status", oldVal:"Idea Pipeline", newVal:"Active" },
   { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Conviction", oldVal:"Neutral", newVal:"High" },
-  { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Sector", oldVal:"Financials", newVal:"Consumer Discretionary" },
-  { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Company Name", oldVal:"JPMorgan Chase", newVal:"Aritzia" },
-  { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Ticker", oldVal:"JPM", newVal:"ATZ" },
-  { ts:"2026-07-07 15:51", user:"Kamaljit Gill", ticker:"CPNG", field:"Research Link", oldVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/CPNG%20Investment%20Case%20(Apr%202026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", newVal:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/Indivior%20Investment%20Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=JMXXV8" },
-  { ts:"2026-07-07 15:50", user:"Kamaljit Gill", ticker:"CPNG", field:"Research Link", oldVal:"", newVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/CPNG%20Investment%20Case%20(Apr%202026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A" },
-  { ts:"2026-07-07 15:49", user:"Kamaljit Gill", ticker:"CPNG", field:"Thesis / Notes", oldVal:"Long-term compounder facing headlines", newVal:"Long-term compounder facing bad headlines" },
-  { ts:"2026-07-07 15:49", user:"Kamaljit Gill", ticker:"CPNG", field:"Thesis / Notes", oldVal:"Long-term compounder trading on bad headlines", newVal:"Long-term compounder facing headlines" },
-  { ts:"2026-07-07 15:49", user:"Kamaljit Gill", ticker:"CPNG", field:"Thesis / Notes", oldVal:"", newVal:"Long-term compounder trading on bad headlines" },
-  { ts:"2026-07-07 15:49", user:"Kamaljit Gill", ticker:"INDV", field:"Thesis / Notes", oldVal:"Self-help + shareholder friendly capital deployment", newVal:"Self help + shareholder friendly capital deployment" },
-  { ts:"2026-07-07 15:49", user:"Kamaljit Gill", ticker:"INDV", field:"Thesis / Notes", oldVal:"Shareholder friendly capital deployment", newVal:"Self-help + shareholder friendly capital deployment" },
-  { ts:"2026-07-07 15:48", user:"Kamaljit Gill", ticker:"INDV", field:"Thesis / Notes", oldVal:"", newVal:"Shareholder friendly capital deployment" },
-  { ts:"2026-07-07 15:48", user:"Kamaljit Gill", ticker:"CPNG", field:"Target Price", oldVal:"22", newVal:"30" }
+  { ts:"2026-07-07 15:52", user:"Kamaljit Gill", ticker:"ATZ", field:"Sector", oldVal:"Financials", newVal:"Consumer Discretionary" }
 ];
+
 
 
 
