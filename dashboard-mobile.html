@@ -91,9 +91,6 @@
   .chart-title { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .6px; }
   .chart-wrap  { position: relative; flex: 1; min-height: 160px; }
 
-  /* PRIORITY ALERTS + ACTIVITY ROW */
-  .insights-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
-
   /* ACTIVITY FEED */
   .activity-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
@@ -292,7 +289,6 @@
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .kpi-row .kpi-card:last-child { grid-column: span 2; }
     .charts-row { grid-template-columns: 1fr; }
-    .insights-row { grid-template-columns: 1fr; }
     .chart-wrap { min-height: 200px; }
     .catalyst, .thesis, .col-updated { display: none; }
     .company { display: none; }
@@ -326,16 +322,13 @@
     .filter-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
     .filter-controls.collapsed { display: none; }
     .charts-row.collapsed { display: none; }
-    /* Grid item children default to min-width:auto - that lets a grid
-       item refuse to shrink below its own content's "natural" size
-       even when the track itself is correctly sized to the phone's
-       width. That was silently forcing .table-card/.activity-card
-       (and everything inside them - the stock cards and activity
-       feed) out to ~1140px wide regardless of screen size, which is
-       why the phone had to zoom the whole page out to fit it - the
-       KPI/chart rows above don't hit this because they aren't sized
-       through a grid item in the same way. */
-    .insights-row .activity-card { max-height: 230px; min-width: 0; }
+    /* Priority Alerts and Recent Activity are standalone full-width
+       cards now (not grid items), so they shrink naturally with the
+       page - just cap their height a bit tighter on phones. The old
+       forced-min-width-1140px bug this comment used to describe was a
+       grid-item quirk that no longer applies since neither card sits
+       in a grid anymore. */
+    .activity-card { max-height: 230px; min-width: 0; }
     .table-card { min-width: 0; }
     .ai-change { flex-wrap: nowrap; }
     .ai-old, .ai-new { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -494,50 +487,13 @@
     </div>
   </div>
 
-  <!-- CHARTS ROW -->
-  <button class="section-toggle" id="chartsToggleBtn" onclick="toggleCharts()">
-    <span>&#128202; Charts &amp; Breakdown</span><span class="chev" id="chartsChev">&#9662;</span>
-  </button>
-  <div class="charts-row collapsed" id="chartsRow">
-    <div class="chart-card">
-      <div class="chart-title">Picks by Sector</div>
-      <div class="chart-wrap"><canvas id="cSector"></canvas></div>
+  <!-- PRIORITY ALERTS -->
+  <div class="activity-card">
+    <div class="activity-header">
+      <span class="title">&#128276; Priority Alerts</span>
+      <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">Long / Short Split</div>
-      <div class="chart-wrap"><canvas id="cDirection"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Conviction Level</div>
-      <div class="chart-wrap"><canvas id="cConviction"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Status Breakdown</div>
-      <div class="chart-wrap"><canvas id="cStatus"></canvas></div>
-    </div>
-  </div>
-
-  <!-- PRIORITY ALERTS + RECENT ACTIVITY -->
-  <div class="insights-row">
-
-    <!-- PRIORITY ALERTS -->
-    <div class="activity-card">
-      <div class="activity-header">
-        <span class="title">&#128276; Priority Alerts</span>
-        <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
-      </div>
-      <div class="activity-list" id="priorityList"></div>
-    </div>
-
-    <!-- RECENT ACTIVITY -->
-    <div class="activity-card">
-      <div class="activity-header">
-        <span class="title">&#128337; Recent Activity</span>
-        <span style="font-size:10px;color:var(--muted)" id="auditCount"></span>
-      </div>
-      <div class="activity-list" id="activityList"></div>
-    </div>
-
+    <div class="activity-list" id="priorityList"></div>
   </div>
 
   <!-- PICKS TABLE -->
@@ -574,6 +530,38 @@
       <div class="mobile-cards" id="mobileCards"></div>
       <div class="empty" id="emptyMsg" style="display:none">No picks match the selected filters.</div>
     </div>
+
+  <!-- CHARTS ROW -->
+  <button class="section-toggle" id="chartsToggleBtn" onclick="toggleCharts()">
+    <span>&#128202; Charts &amp; Breakdown</span><span class="chev" id="chartsChev">&#9662;</span>
+  </button>
+  <div class="charts-row collapsed" id="chartsRow">
+    <div class="chart-card">
+      <div class="chart-title">Picks by Sector</div>
+      <div class="chart-wrap"><canvas id="cSector"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Long / Short Split</div>
+      <div class="chart-wrap"><canvas id="cDirection"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Conviction Level</div>
+      <div class="chart-wrap"><canvas id="cConviction"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Status Breakdown</div>
+      <div class="chart-wrap"><canvas id="cStatus"></canvas></div>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY -->
+  <div class="activity-card">
+    <div class="activity-header">
+      <span class="title">&#128337; Recent Activity</span>
+      <span style="font-size:10px;color:var(--muted)" id="auditCount"></span>
+    </div>
+    <div class="activity-list" id="activityList"></div>
+  </div>
 
 </main>
 
@@ -635,12 +623,6 @@ const STOCKS = [
   { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"" },
   { ticker:"MET", company:"MetLife", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"1", target:"", status:"Idea Pipeline", catalyst:"MET earns August 6", thesis:"Initial review for office exposure; also private credit", date:"", link:"", memo:"" }
 ];
-
-
-
-
-
-
 
 
 
@@ -797,12 +779,6 @@ const AUDIT = [
   { ts:"2026-07-07 16:07", user:"Kamaljit Gill", ticker:"RACE", field:"Thesis / Notes", oldVal:"Low valuation v. recent history despite potential tailwind from growthin HNWI", newVal:"Low valuation v. recent history despite potential tailwind from growth in HNWIs" },
   { ts:"2026-07-07 16:07", user:"Kamaljit Gill", ticker:"RACE", field:"Thesis / Notes", oldVal:"Valuation at historical", newVal:"Low valuation v. recent history despite potential tailwind from growthin HNWI" }
 ];
-
-
-
-
-
-
 
 
 
