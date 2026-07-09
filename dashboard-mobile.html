@@ -91,8 +91,8 @@
   .chart-title { font-size: 12px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: .6px; }
   .chart-wrap  { position: relative; flex: 1; min-height: 160px; }
 
-  /* ACTIVITY + TABLE ROW */
-  .bottom-row { display: grid; grid-template-columns: 220px 1fr; gap: 12px; align-items: start; }
+  /* PRIORITY ALERTS + ACTIVITY ROW */
+  .insights-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
 
   /* ACTIVITY FEED */
   .activity-card {
@@ -120,6 +120,10 @@
   .ai-new    { color: var(--text); font-weight: 600; }
   .ai-meta   { font-size: 10px; color: var(--muted); margin-top: 2px; }
   .activity-empty { padding: 32px; text-align: center; color: var(--muted); font-size: 12px; }
+  .pa-newpick  { border-left: 3px solid var(--teal); }
+  .pa-conviction { border-left: 3px solid #f2b544; }
+  .pa-target   { border-left: 3px solid #7c8cff; }
+  .pa-catalyst { border-left: 3px solid #ef6a6a; }
 
   /* TABLE */
   .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -288,7 +292,7 @@
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .kpi-row .kpi-card:last-child { grid-column: span 2; }
     .charts-row { grid-template-columns: 1fr; }
-    .bottom-row { grid-template-columns: 1fr; }
+    .insights-row { grid-template-columns: 1fr; }
     .chart-wrap { min-height: 200px; }
     .catalyst, .thesis, .col-updated { display: none; }
     .company { display: none; }
@@ -322,17 +326,17 @@
     .filter-controls { display: flex; flex-direction: column; gap: 8px; width: 100%; margin-top: 10px; }
     .filter-controls.collapsed { display: none; }
     .charts-row.collapsed { display: none; }
-    /* .bottom-row's two children are grid items, which default to
-       min-width:auto - that lets a grid item refuse to shrink below
-       its own content's "natural" size even when the track itself is
-       correctly sized to the phone's width. That was silently forcing
-       .table-card/.activity-card (and everything inside them - the
-       stock cards and activity feed) out to ~1140px wide regardless of
-       screen size, which is why the phone had to zoom the whole page
-       out to fit it - the KPI/chart rows above don't hit this because
-       they aren't sized through a grid item in the same way. */
-    .table-card { order: 1; min-width: 0; }
-    .activity-card { order: 2; max-height: 260px; min-width: 0; }
+    /* Grid item children default to min-width:auto - that lets a grid
+       item refuse to shrink below its own content's "natural" size
+       even when the track itself is correctly sized to the phone's
+       width. That was silently forcing .table-card/.activity-card
+       (and everything inside them - the stock cards and activity
+       feed) out to ~1140px wide regardless of screen size, which is
+       why the phone had to zoom the whole page out to fit it - the
+       KPI/chart rows above don't hit this because they aren't sized
+       through a grid item in the same way. */
+    .insights-row .activity-card { max-height: 260px; min-width: 0; }
+    .table-card { min-width: 0; }
     .ai-change { flex-wrap: nowrap; }
     .ai-old, .ai-new { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .ai-old { flex: 0 1 auto; max-width: 42%; }
@@ -445,6 +449,7 @@
   <span class="filter-label filter-label-desktop">Filters</span>
   <div class="filter-controls collapsed" id="filterControls">
     <div class="filter-group">
+      <select id="fAssignment"><option value="">All Assignments</option><option>Self-Sourced</option><option>PM-Assigned</option></select>
       <select id="fAnalyst"><option value="">All Analysts</option></select>
       <select id="fSector"><option value="">All Sectors</option></select>
       <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
@@ -512,10 +517,19 @@
     </div>
   </div>
 
-  <!-- ACTIVITY + TABLE -->
-  <div class="bottom-row">
+  <!-- PRIORITY ALERTS + RECENT ACTIVITY -->
+  <div class="insights-row">
 
-    <!-- ACTIVITY FEED -->
+    <!-- PRIORITY ALERTS -->
+    <div class="activity-card">
+      <div class="activity-header">
+        <span class="title">&#128276; Priority Alerts</span>
+        <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
+      </div>
+      <div class="activity-list" id="priorityList"></div>
+    </div>
+
+    <!-- RECENT ACTIVITY -->
     <div class="activity-card">
       <div class="activity-header">
         <span class="title">&#128337; Recent Activity</span>
@@ -524,8 +538,10 @@
       <div class="activity-list" id="activityList"></div>
     </div>
 
-    <!-- PICKS TABLE -->
-    <div class="table-card">
+  </div>
+
+  <!-- PICKS TABLE -->
+  <div class="table-card">
       <div class="table-header">
         <span class="title">Stock Picks</span>
         <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
@@ -559,7 +575,6 @@
       <div class="empty" id="emptyMsg" style="display:none">No picks match the selected filters.</div>
     </div>
 
-  </div>
 </main>
 
 <footer>Riposte Capital &nbsp;·&nbsp; Research Command Center &nbsp;·&nbsp; For internal use only</footer>
@@ -600,7 +615,7 @@ const STOCKS = [
   { ticker:"QXO", company:"QXO Inc.", assignment:"", dateAdded:"2026-07-01", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"0", target:"30", status:"Archived", catalyst:"Earnings August 10", thesis:"Merger noise in stock subsides", date:"2026-07-01", link:"", memo:"" },
   { ticker:"CPNG", company:"Coupang", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"0", target:"", status:"Archived", catalyst:"", thesis:"Long-term compounder facing bad headlines", date:"2026-07-08", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Indivior Investment Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=JMXXV8", memo:"" },
   { ticker:"INDV", company:"Indivior", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Long", conviction:"0", target:"", status:"Archived", catalyst:"", thesis:"Self help + shareholder friendly capital deployment", date:"2026-07-08", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"" },
-  { ticker:"TPB", company:"Turning Point Brands", assignment:"", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Long", conviction:"5", target:"600", status:"Active", catalyst:"", thesis:"Distribution expansion driving long term market share", date:"2026-07-08", link:"", memo:"" },
+  { ticker:"TPB", company:"Turning Point Brands", assignment:"", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Long", conviction:"5", target:"", status:"Active", catalyst:"", thesis:"Distribution expansion driving long term market share", date:"2026-07-08", link:"", memo:"" },
   { ticker:"ATZ", company:"Aritzia", assignment:"", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"", status:"Active", catalyst:"Q2 Earnings July 9", thesis:"High brand heat, unit growth story, GLP-1 demand upside", date:"2026-07-08", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/ATZ (2026.05.01).pptx?d=w46a4707ca5764c328afddc9c3e1a02f3&csf=1&web=1&e=9klcGT", memo:"" },
   { ticker:"RACE", company:"Ferrari NV", assignment:"", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"", status:"Active", catalyst:"Q2 Earnings July 30", thesis:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", date:"2026-07-08", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Race Investment Case June 2026.docx?d=w342cc5ab68e240a09ce08cb064739a01&csf=1&web=1&e=EEaSv4", memo:"" },
   { ticker:"CMCSA", company:"Comcast", assignment:"", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15", status:"Active", catalyst:"Q2 Earnings July 23", thesis:"Starlink broaband disruption thesis", date:"2026-07-08", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"" },
@@ -895,6 +910,7 @@ function timeAgo(tsStr) {
 
 // ── Filters ───────────────────────────────────────────────────
 function getFiltered() {
+  const asn = document.getElementById('fAssignment').value;
   const a  = document.getElementById('fAnalyst').value;
   const s  = document.getElementById('fSector').value;
   const d  = document.getElementById('fDirection').value;
@@ -904,6 +920,7 @@ function getFiltered() {
   const q  = (document.getElementById('searchBox').value || '').toLowerCase();
   return STOCKS.filter(r =>
     (!showStarredOnly || isStarred(r.ticker)) &&
+    (!asn|| r.assignment === asn) &&
     (!a  || r.analyst    === a)  &&
     (!s  || r.sector     === s)  &&
     (!d  || r.direction  === d)  &&
@@ -1013,6 +1030,59 @@ function renderActivity() {
       <div class="ai-top">
         <span class="ai-ticker">${a.ticker}</span>
         <span class="ai-field">${a.field}</span>
+      </div>
+      <div class="ai-change">
+        ${a.oldVal ? `<span class="ai-old">${a.oldVal}</span><span class="ai-arrow">→</span>` : ''}
+        <span class="ai-new">${a.newVal || '—'}</span>
+      </div>
+      <div class="ai-meta">${a.user} &nbsp;·&nbsp; ${timeAgo(a.ts)}</div>
+    </div>
+  `).join('');
+}
+
+// ── Priority Alerts ───────────────────────────────────────────
+const PRIORITY_FIELDS = { 'Ticker':'pa-newpick', 'Conviction':'pa-conviction', 'Target Price':'pa-target', 'Next Catalyst':'pa-catalyst' };
+
+function alertIcon(field) {
+  switch (field) {
+    case 'Ticker': return '&#10024;';        // new pick
+    case 'Conviction': return '&#127919;';   // conviction change
+    case 'Target Price': return '&#128181;'; // target price change
+    case 'Next Catalyst': return '&#9889;';  // catalyst change
+    default: return '&#8226;';
+  }
+}
+
+function alertLabel(a) {
+  if (a.field === 'Ticker') return 'New pick added';
+  if (a.field === 'Conviction') return 'Conviction changed';
+  if (a.field === 'Target Price') return 'Target price changed';
+  if (a.field === 'Next Catalyst') return 'Catalyst updated';
+  return a.field;
+}
+
+function getPriorityAlerts() {
+  return AUDIT.filter(a => {
+    if (a.field === 'Ticker') return !a.oldVal && a.newVal; // only true new-pick adds, not row clears
+    return a.field === 'Conviction' || a.field === 'Target Price' || a.field === 'Next Catalyst';
+  }).slice(0, 20);
+}
+
+function renderPriorityAlerts() {
+  const list = document.getElementById('priorityList');
+  const alerts = getPriorityAlerts();
+  document.getElementById('priorityCount').textContent = alerts.length ? `${alerts.length} alerts` : '';
+
+  if (!alerts.length) {
+    list.innerHTML = '<div class="activity-empty">No priority updates yet.</div>';
+    return;
+  }
+
+  list.innerHTML = alerts.map(a => `
+    <div class="activity-item ${PRIORITY_FIELDS[a.field] || ''}">
+      <div class="ai-top">
+        <span class="ai-ticker">${alertIcon(a.field)} ${a.ticker}</span>
+        <span class="ai-field">${alertLabel(a)}</span>
       </div>
       <div class="ai-change">
         ${a.oldVal ? `<span class="ai-old">${a.oldVal}</span><span class="ai-arrow">→</span>` : ''}
@@ -1135,7 +1205,7 @@ function render() {
 }
 
 function resetFilters() {
-  ['fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id => document.getElementById(id).value='');
+  ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id => document.getElementById(id).value='');
   document.getElementById('searchBox').value='';
   showStarredOnly = false;
   document.getElementById('starFilterBtn').classList.remove('active');
@@ -1236,9 +1306,10 @@ document.getElementById('hdrDate').textContent =
 
 populateFilters();
 renderActivity();
+renderPriorityAlerts();
 render();
 
-['fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id =>
+['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id =>
   document.getElementById(id).addEventListener('change', render)
 );
 </script>
