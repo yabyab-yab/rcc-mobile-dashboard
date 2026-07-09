@@ -96,6 +96,7 @@
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     display: flex; flex-direction: column; max-height: 320px;
   }
+  .activity-card.priority-card { max-height: 235px; } /* ~3 alerts visible before scroll */
   .activity-header {
     padding: 11px 14px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
@@ -488,7 +489,7 @@
   </div>
 
   <!-- PRIORITY ALERTS -->
-  <div class="activity-card">
+  <div class="activity-card priority-card">
     <div class="activity-header">
       <span class="title">&#128276; Priority Alerts</span>
       <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
