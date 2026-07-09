@@ -97,16 +97,16 @@
   /* ACTIVITY FEED */
   .activity-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
-    display: flex; flex-direction: column; max-height: 440px;
+    display: flex; flex-direction: column; max-height: 320px;
   }
   .activity-header {
-    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
   }
-  .activity-header .title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
-  .activity-list { overflow-y: auto; flex: 1; padding: 8px 0; }
+  .activity-header .title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; }
+  .activity-list { overflow-y: auto; flex: 1; padding: 4px 0; }
   .activity-item {
-    padding: 9px 16px; border-bottom: 1px solid rgba(38,54,96,.5);
+    padding: 7px 14px; border-bottom: 1px solid rgba(38,54,96,.5);
     transition: background .15s;
   }
   .activity-item:hover { background: var(--card2); }
@@ -123,7 +123,7 @@
   .pa-newpick  { border-left: 3px solid var(--teal); }
   .pa-conviction { border-left: 3px solid #f2b544; }
   .pa-target   { border-left: 3px solid #7c8cff; }
-  .pa-catalyst { border-left: 3px solid #ef6a6a; }
+  .pa-assignment { border-left: 3px solid #c084fc; }
 
   /* TABLE */
   .table-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
@@ -335,7 +335,7 @@
        why the phone had to zoom the whole page out to fit it - the
        KPI/chart rows above don't hit this because they aren't sized
        through a grid item in the same way. */
-    .insights-row .activity-card { max-height: 260px; min-width: 0; }
+    .insights-row .activity-card { max-height: 230px; min-width: 0; }
     .table-card { min-width: 0; }
     .ai-change { flex-wrap: nowrap; }
     .ai-old, .ai-new { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -639,18 +639,6 @@ const STOCKS = [
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 const AUDIT = [
   { ts:"2026-07-09 15:06", user:"Kamaljit Gill", ticker:"RCI", field:"Thesis / Notes", oldVal:"TEST", newVal:"Starlink broaband disruption thesis" },
   { ts:"2026-07-09 15:06", user:"Kamaljit Gill", ticker:"RCI", field:"Thesis / Notes", oldVal:"Starlink broaband disruption thesis", newVal:"TEST" },
@@ -803,18 +791,6 @@ const AUDIT = [
   { ts:"2026-07-07 15:48", user:"Kamaljit Gill", ticker:"INDV", field:"Target Price", oldVal:"30", newVal:"50" },
   { ts:"2026-07-06 12:44", user:"Kamaljit Gill", ticker:"JPM", field:"Target Price", oldVal:"68", newVal:"70" }
 ];
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1140,6 +1116,8 @@ function updateCharts(data) {
 }
 
 // ── Activity Feed ─────────────────────────────────────────────
+const ACTIVITY_DISPLAY_LIMIT = 25;
+
 function renderActivity() {
   const list = document.getElementById('activityList');
   document.getElementById('auditCount').textContent = AUDIT.length ? `${AUDIT.length} entries` : '';
@@ -1149,7 +1127,7 @@ function renderActivity() {
     return;
   }
 
-  list.innerHTML = AUDIT.map(a => `
+  list.innerHTML = AUDIT.slice(0, ACTIVITY_DISPLAY_LIMIT).map(a => `
     <div class="activity-item">
       <div class="ai-top">
         <span class="ai-ticker">${a.ticker}</span>
@@ -1165,14 +1143,14 @@ function renderActivity() {
 }
 
 // ── Priority Alerts ───────────────────────────────────────────
-const PRIORITY_FIELDS = { 'Ticker':'pa-newpick', 'Conviction':'pa-conviction', 'Target Price':'pa-target', 'Next Catalyst':'pa-catalyst' };
+const PRIORITY_FIELDS = { 'Ticker':'pa-newpick', 'Conviction':'pa-conviction', 'Target Price':'pa-target', 'Assignments':'pa-assignment' };
 
 function alertIcon(field) {
   switch (field) {
     case 'Ticker': return '&#10024;';        // new pick
     case 'Conviction': return '&#127919;';   // conviction change
     case 'Target Price': return '&#128181;'; // target price change
-    case 'Next Catalyst': return '&#9889;';  // catalyst change
+    case 'Assignments': return '&#128100;';  // assignment change
     default: return '&#8226;';
   }
 }
@@ -1181,14 +1159,14 @@ function alertLabel(a) {
   if (a.field === 'Ticker') return 'New pick added';
   if (a.field === 'Conviction') return 'Conviction changed';
   if (a.field === 'Target Price') return 'Target price changed';
-  if (a.field === 'Next Catalyst') return 'Catalyst updated';
+  if (a.field === 'Assignments') return 'Assignment changed';
   return a.field;
 }
 
 function getPriorityAlerts() {
   return AUDIT.filter(a => {
     if (a.field === 'Ticker') return !a.oldVal && a.newVal; // only true new-pick adds, not row clears
-    return a.field === 'Conviction' || a.field === 'Target Price' || a.field === 'Next Catalyst';
+    return a.field === 'Conviction' || a.field === 'Target Price' || a.field === 'Assignments';
   }).slice(0, 20);
 }
 
