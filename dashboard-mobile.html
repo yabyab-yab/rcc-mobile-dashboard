@@ -647,7 +647,7 @@ const STOCKS = [
   { ticker:"PCAR", company:"PACCAR Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"3", target:"", status:"Idea Pipeline", catalyst:"EPA will release new engine rules, July '26", thesis:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside", date:"2026-07-09", link:"", memo:"" },
   { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"" },
   { ticker:"MET", company:"MetLife", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"1", target:"", status:"Idea Pipeline", catalyst:"MET earns August 6", thesis:"Initial review for office exposure; also private credit", date:"", link:"", memo:"" },
-  { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-09", link:"", memo:"" }
+  { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"5", target:"5", status:"Active", catalyst:"Earninsg early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"" }
 ];
 
 
@@ -656,7 +656,14 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-09 16:51", user:"Khaled Beydoun", ticker:"HPK", field:"Conviction", oldVal:"4", newVal:"5" },
+  { ts:"2026-07-09 16:50", user:"Khaled Beydoun", ticker:"HPK", field:"Thesis / Notes", oldVal:"", newVal:"Lowest quality E&P producers. Levered with no FCF and bad rock." },
+  { ts:"2026-07-09 16:49", user:"Khaled Beydoun", ticker:"HPK", field:"Next Catalyst", oldVal:"", newVal:"Earninsg early August" },
+  { ts:"2026-07-09 16:49", user:"Khaled Beydoun", ticker:"HPK", field:"Status", oldVal:"Idea Pipeline", newVal:"Active" },
+  { ts:"2026-07-09 16:49", user:"Khaled Beydoun", ticker:"HPK", field:"Target Price", oldVal:"", newVal:"5" },
+  { ts:"2026-07-09 16:49", user:"Khaled Beydoun", ticker:"HPK", field:"Conviction", oldVal:"", newVal:"4" },
   { ts:"2026-07-09 16:41", user:"Youssef Ait Boulahri", ticker:"HPK", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
   { ts:"2026-07-09 16:39", user:"Youssef Ait Boulahri", ticker:"HPK", field:"Analyst", oldVal:"", newVal:"Khaled Beydoun" },
   { ts:"2026-07-09 16:38", user:"Youssef Ait Boulahri", ticker:"HPK", field:"Direction", oldVal:"", newVal:"Short" },
@@ -800,14 +807,9 @@ const AUDIT = [
   { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Target Price", oldVal:"", newVal:"54" },
   { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Conviction", oldVal:"", newVal:"High" },
   { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Direction", oldVal:"", newVal:"Long" },
-  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Sector", oldVal:"", newVal:"Communication Services" },
-  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
-  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Company Name", oldVal:"", newVal:"Comcast" },
-  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Ticker", oldVal:"", newVal:"CMCSA" },
-  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Research Link", oldVal:"", newVal:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/Starlink_vSensitivity%20Investment%20Case%20(June%202026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z" },
-  { ts:"2026-07-07 16:08", user:"Kamaljit Gill", ticker:"CMCSA", field:"Thesis / Notes", oldVal:"Broaband", newVal:"Starlink broaband disruption thesis" },
-  { ts:"2026-07-07 16:07", user:"Kamaljit Gill", ticker:"CMCSA", field:"Thesis / Notes", oldVal:"Ad-supported tier driving ARPU expansion", newVal:"Broaband" }
+  { ts:"2026-07-07 16:09", user:"Kamaljit Gill", ticker:"CMCSA", field:"Sector", oldVal:"", newVal:"Communication Services" }
 ];
+
 
 
 
