@@ -186,6 +186,23 @@
   .stale-badge { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); margin-left: 4px; vertical-align: middle; title: "Not updated in 30+ days"; }
   .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
 
+  /* Archived Stocks - collapsed section at the bottom of the table/cards */
+  .archived-toggle-row td {
+    background: var(--navy2); color: var(--muted); font-weight: 700; font-size: 11px;
+    text-transform: uppercase; letter-spacing: .6px; cursor: pointer; padding: 11px 14px;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); user-select: none;
+  }
+  .archived-toggle-row:hover td { color: var(--teal); }
+  .archived-toggle-row .chev { display: inline-block; margin-right: 6px; color: var(--teal); font-size: 10px; }
+  tr.archived-row.is-hidden, .mobile-card.archived-row.is-hidden { display: none; }
+  .archived-toggle-card {
+    padding: 11px 14px; margin: 10px 0 4px; border-radius: 8px; background: var(--navy2);
+    color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase;
+    letter-spacing: .6px; cursor: pointer; text-align: center; border: 1px solid var(--border);
+  }
+  .archived-toggle-card:hover { color: var(--teal); }
+  .archived-toggle-card .chev { color: var(--teal); font-size: 10px; margin-right: 6px; }
+
   /* FOOTER */
   footer { text-align: center; padding: 16px; font-size: 10px; color: var(--muted); border-top: 1px solid var(--border); margin-top: 4px; }
 
@@ -527,6 +544,7 @@
               <th>Next Catalyst</th>
               <th>Thesis</th>
               <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
+              <th class="col-updated" onclick="sortBy('dateAdded')">Initial Date <span class="sort-icon" id="si-dateAdded">▲</span></th>
               <th>Docs</th>
               <th>PM Note</th>
             </tr>
@@ -569,19 +587,19 @@ const STOCKS = [
   { ticker:"DRH", company:"DiamondRock Hospitality Co.", analyst:"", sector:"", direction:"James Gildea", conviction:"Real Estate", target:"Long", status:"5", catalyst:"14.5", thesis:"Active", date:"DRH earns July 30", link:"RevPAR tailwind; NAV discount w/ proof; possible takeout", memo:"7/1/2026 11:46:00 AM" },
   { ticker:"JHX", company:"James Hardie Industries", analyst:"", sector:"", direction:"James Gildea", conviction:"Housing", target:"Long", status:"4", catalyst:"35", thesis:"Active", date:"JHX earns August 19; Index incl ?", link:"Secular share gainer; benifits of AZEK ongoing; index incl", memo:"7/1/2026 11:47:00 AM" },
   { ticker:"VIK", company:"Viking Holdings Ltd", analyst:"", sector:"", direction:"James Gildea", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"80", thesis:"Archived", date:"VIK earns August 19", link:"Pure upper income North America; brand moat; stock expensive", memo:"7/1/2026 11:47:00 AM" },
-  { ticker:"WSM", company:"Williams-Sonoma Inc.", analyst:"PM-Assigned", sector:"", direction:"James Gildea", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"260", thesis:"Idea Pipeline", date:"WSM earns August 29", link:"Consumer strength; Pottery Barn turnaround", memo:"7/1/2026 11:47:00 AM" },
-  { ticker:"VICI", company:"VICI Properties Inc.", analyst:"Self-Sourced", sector:"", direction:"James Gildea", conviction:"Real Estate", target:"Short", status:"4", catalyst:"19.75", thesis:"Idea Pipeline", date:"GLPI earns July 24; VICI July 29", link:"CZR exposure; stretching on risky deals", memo:"6/26/2026 4:57:00 PM" },
+  { ticker:"WSM", company:"Williams-Sonoma Inc.", analyst:"Self-Sourced", sector:"", direction:"James Gildea", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"260", thesis:"Idea Pipeline", date:"WSM earns August 29", link:"Consumer strength; Pottery Barn turnaround", memo:"7/1/2026 11:47:00 AM" },
+  { ticker:"VICI", company:"VICI Properties Inc.", analyst:"Self-Sourced", sector:"", direction:"James Gildea", conviction:"Real Estate", target:"Short", status:"4", catalyst:"19.75", thesis:"Active", date:"GLPI earns July 24; VICI July 29", link:"CZR exposure; stretching on risky deals", memo:"6/26/2026 4:57:00 PM" },
   { ticker:"CCL", company:"Carnival Corporation", analyst:"", sector:"", direction:"James Gildea", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"105", thesis:"Archived", date:"RCL earns July 29", link:"Inexpensive stock; leisure value proposition; headline risk", memo:"6/26/2026 4:56:00 PM" },
   { ticker:"BX", company:"Blackstone Inc.", analyst:"", sector:"", direction:"James Gildea", conviction:"Financials", target:"Short", status:"3", catalyst:"85", thesis:"Idea Pipeline", date:"BX earns July 23", link:"Too big to grow; private credit fear and AI disrupt fear", memo:"6/26/2026 4:56:00 PM" },
   { ticker:"EG", company:"Everest Group Ltd.", analyst:"", sector:"", direction:"James Gildea", conviction:"Financials", target:"Short", status:"2", catalyst:"340", thesis:"Idea Pipeline", date:"RNR earns July 23; ACGL July 28; EG Jul 30", link:"Sector pricing headwinds, weak player", memo:"6/26/2026 4:56:00 PM" },
   { ticker:"JLL", company:"Jones Lang LaSalle Inc.", analyst:"", sector:"", direction:"James Gildea", conviction:"Real Estate", target:"Long", status:"0", catalyst:"375", thesis:"Archived", date:"CBRE earns July 29; JLL July 30", link:"CRE transaction volume recovery early innings; tagged as AI loser", memo:"7/1/2026 11:47:00 AM" },
   { ticker:"LPX", company:"Louisiana-Pacific Corporation", analyst:"", sector:"", direction:"James Gildea", conviction:"Housing", target:"Long", status:"2", catalyst:"84", thesis:"Idea Pipeline", date:"LPX earns August 6", link:"Secular share gainer", memo:"7/1/2026 11:49:00 AM" },
   { ticker:"QXO", company:"QXO Inc.", analyst:"", sector:"7/1/2026", direction:"James Gildea", conviction:"Housing", target:"Long", status:"0", catalyst:"30", thesis:"Archived", date:"Earnings August 10", link:"Merger noise in stock subsides", memo:"7/1/2026 11:49:00 AM" },
-  { ticker:"CPNG", company:"Coupang", analyst:"", sector:"", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"30", thesis:"Archived", date:"", link:"Long-term compounder facing bad headlines", memo:"7/8/2026 4:26:00 PM" },
-  { ticker:"INDV", company:"Indivior", analyst:"", sector:"", direction:"Kamaljit Gill", conviction:"Healthcare", target:"Long", status:"0", catalyst:"50", thesis:"Archived", date:"", link:"Self help + shareholder friendly capital deployment", memo:"7/8/2026 4:26:00 PM" },
+  { ticker:"CPNG", company:"Coupang", analyst:"", sector:"", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"0", catalyst:"", thesis:"Archived", date:"", link:"Long-term compounder facing bad headlines", memo:"7/8/2026 4:26:00 PM" },
+  { ticker:"INDV", company:"Indivior", analyst:"", sector:"", direction:"Kamaljit Gill", conviction:"Healthcare", target:"Long", status:"0", catalyst:"", thesis:"Archived", date:"", link:"Self help + shareholder friendly capital deployment", memo:"7/8/2026 4:26:00 PM" },
   { ticker:"TPB", company:"Turning Point Brands", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Consumer Staples", target:"Long", status:"5", catalyst:"600", thesis:"Active", date:"", link:"Distribution expansion driving long term market share", memo:"7/8/2026 4:24:00 PM" },
-  { ticker:"ATZ", company:"Aritzia", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"5", catalyst:"290", thesis:"Active", date:"Q2 Earnings July 9", link:"High brand heat, unit growth story, GLP-1 demand upside", memo:"7/8/2026 4:25:00 PM" },
-  { ticker:"RACE", company:"Ferrari NV", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"5", catalyst:"430", thesis:"Active", date:"Q2 Earnings July 30", link:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", memo:"7/8/2026 4:25:00 PM" },
+  { ticker:"ATZ", company:"Aritzia", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"5", catalyst:"", thesis:"Active", date:"Q2 Earnings July 9", link:"High brand heat, unit growth story, GLP-1 demand upside", memo:"7/8/2026 4:25:00 PM" },
+  { ticker:"RACE", company:"Ferrari NV", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Consumer Discretionary", target:"Long", status:"5", catalyst:"", thesis:"Active", date:"Q2 Earnings July 30", link:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", memo:"7/8/2026 4:25:00 PM" },
   { ticker:"CMCSA", company:"Comcast", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Communication Services", target:"Short", status:"5", catalyst:"15", thesis:"Active", date:"Q2 Earnings July 23", link:"Starlink broaband disruption thesis", memo:"7/8/2026 4:27:00 PM" },
   { ticker:"T", company:"AT&T", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Communication Services", target:"Short", status:"5", catalyst:"15", thesis:"Active", date:"Q2 Earnings July 22", link:"Starlink broaband disruption thesis", memo:"7/8/2026 4:26:00 PM" },
   { ticker:"RCI", company:"Rogers Communications", analyst:"", sector:"7/7/2026", direction:"Kamaljit Gill", conviction:"Communication Services", target:"Short", status:"5", catalyst:"25", thesis:"Active", date:"Q2 Earnings July 22", link:"Starlink broaband disruption thesis", memo:"7/8/2026 4:26:00 PM" },
@@ -596,17 +614,8 @@ const STOCKS = [
   { ticker:"BBY", company:"BestBuy", analyst:"", sector:"7/2/2026", direction:"Tehmur Jabbar", conviction:"Consumer Discretionary", target:"Short", status:"4", catalyst:"43", thesis:"Active", date:"H2 memory shortfall, watch for pull forward", link:"Memory shortage=> -1% SSS vs cons +1 current year. 8x $5.30 EPS vs cons 6.60 =43", memo:"7/8/2026 3:53:00 PM" },
   { ticker:"KNIN SW", company:"Kuehne & Nagel", analyst:"", sector:"7/2/2026", direction:"Tehmur Jabbar", conviction:"Industrials", target:"Short", status:"2", catalyst:"160", thesis:"Active", date:"DSV hedge", link:"19x '27 EV/EBIT vs DSV at 16x with synergy story and capital return. 16x cons = 160CHF", memo:"7/8/2026 3:47:00 PM" },
   { ticker:"PCAR", company:"PACCAR Inc", analyst:"", sector:"7/8/2026", direction:"Tehmur Jabbar", conviction:"Industrials", target:"Long", status:"3", catalyst:"", thesis:"Idea Pipeline", date:"EPA will release new engine rules, July '26", link:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside", memo:"7/8/2026 3:53:00 PM" },
-  { ticker:"TOST", company:"Toast Inc", analyst:"", sector:"7/8/2026", direction:"Tehmur Jabbar", conviction:"Information Technology", target:"Short", status:"3", catalyst:"", thesis:"Idea Pipeline", date:"", link:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", memo:"7/8/2026 3:57:00 PM" }
+  { ticker:"TOST", company:"Toast Inc", analyst:"", sector:"7/8/2026", direction:"Tehmur Jabbar", conviction:"Information Technology", target:"Short", status:"3", catalyst:"", thesis:"Active", date:"", link:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", memo:"7/8/2026 3:57:00 PM" }
 ];
-
-
-
-
-
-
-
-
-
 
 
 
@@ -663,15 +672,6 @@ const AUDIT = [
   { ts:"2026-07-08 08:34", user:"Tehmur Jabbar", ticker:"PCAR", field:"Sector", oldVal:"", newVal:"Industrials" },
   { ts:"2026-07-08 08:33", user:"Tehmur Jabbar", ticker:"PCAR", field:"Analyst", oldVal:"", newVal:"Tehmur Jabbar" }
 ];
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1020,6 +1020,61 @@ function renderActivity() {
 }
 
 // ── Table ─────────────────────────────────────────────────────
+const TABLE_COLSPAN = 15;
+
+function buildRow(r) {
+  const stale = isStale(r.date) ? '<span class="stale-badge" title="Not updated in 30+ days"></span>' : '';
+  const thesisExpanded = expandedTickers.has(r.ticker);
+  const thesisInner = r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">—</span>';
+  const thesisHtml = r.thesis
+    ? `<span class="thesis-text${thesisExpanded?' expanded':''}"${thesisExpanded?'':` title="${r.thesis}"`}>${thesisInner}</span><span class="thesis-toggle" onclick="toggleThesis('${r.ticker}')" title="${thesisExpanded?'Collapse':'Expand full thesis'}">${thesisExpanded?'▲':'▾'}</span>`
+    : thesisInner;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'★':'☆'}</button></td>
+    <td class="ticker">${r.ticker}</td>
+    <td class="company">${r.company}</td>
+    <td>${r.analyst}</td>
+    <td>${r.sector||'<span class="badge-none">—</span>'}</td>
+    <td>${badge(r.direction)}</td>
+    <td>${badge(r.conviction)}</td>
+    <td class="target-price">${r.target ? '$' + parseFloat(r.target).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '<span class="badge-none">—</span>'}</td>
+    <td>${badge(r.status)}</td>
+    <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
+    <td class="thesis">${thesisHtml}</td>
+    <td class="col-updated">${r.date}${stale}</td>
+    <td class="col-updated">${r.dateAdded||'<span class="badge-none">—</span>'}</td>
+    <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">—</span>'}</td>
+    <td><button class="note-icon-btn" onclick="openNoteModal('${r.ticker}')">&#128172; Note</button></td>
+  `;
+  return tr;
+}
+
+function buildCard(r) {
+  const card = document.createElement('div');
+  card.className = 'mobile-card';
+  card.innerHTML = `
+    <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
+    <div class="mc-company">${r.company}</div>
+    <div class="mc-badges">${badge(r.direction)}${r.conviction?badge(r.conviction):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
+    ${r.catalyst?`<div class="mc-catalyst">&#9889; ${r.catalyst}</div>`:''}
+    ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
+    ${r.dateAdded?`<div class="mc-meta" style="margin-top:4px">Initial date: ${r.dateAdded}</div>`:''}
+    ${r.link?`<div style="margin-top:8px"><a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View Research</a></div>`:''}
+  `;
+  return card;
+}
+
+// Archived picks collapse into their own section at the bottom instead
+// of sitting mixed in with Active/Idea Pipeline picks. If the Status
+// filter is explicitly set to Archived, there's no "other" section to
+// separate them from, so they're just shown flat like any other filter.
+let archivedExpanded = false;
+function toggleArchivedSection() {
+  archivedExpanded = !archivedExpanded;
+  render();
+}
+
 function updateTable(data) {
   const tbody  = document.getElementById('picksBody');
   const mobile = document.getElementById('mobileCards');
@@ -1029,44 +1084,41 @@ function updateTable(data) {
   if (!data.length) { empty.style.display='block'; return; }
   empty.style.display = 'none';
 
-  data.forEach(r => {
-    const stale = isStale(r.date) ? '<span class="stale-badge" title="Not updated in 30+ days"></span>' : '';
-    const thesisExpanded = expandedTickers.has(r.ticker);
-    const thesisInner = r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">—</span>';
-    const thesisHtml = r.thesis
-      ? `<span class="thesis-text${thesisExpanded?' expanded':''}"${thesisExpanded?'':` title="${r.thesis}"`}>${thesisInner}</span><span class="thesis-toggle" onclick="toggleThesis('${r.ticker}')" title="${thesisExpanded?'Collapse':'Expand full thesis'}">${thesisExpanded?'▲':'▾'}</span>`
-      : thesisInner;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'★':'☆'}</button></td>
-      <td class="ticker">${r.ticker}</td>
-      <td class="company">${r.company}</td>
-      <td>${r.analyst}</td>
-      <td>${r.sector||'<span class="badge-none">—</span>'}</td>
-      <td>${badge(r.direction)}</td>
-      <td>${badge(r.conviction)}</td>
-      <td class="target-price">${r.target ? '$' + parseFloat(r.target).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2}) : '<span class="badge-none">—</span>'}</td>
-      <td>${badge(r.status)}</td>
-      <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
-      <td class="thesis">${thesisHtml}</td>
-      <td class="col-updated">${r.date}${stale}</td>
-      <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">—</span>'}</td>
-      <td><button class="note-icon-btn" onclick="openNoteModal('${r.ticker}')">&#128172; Note</button></td>
-    `;
-    tbody.appendChild(tr);
+  const statusFilter = document.getElementById('fStatus').value;
+  const splitArchived = statusFilter !== 'Archived';
+  const main     = splitArchived ? data.filter(r => r.status !== 'Archived') : data;
+  const archived = splitArchived ? data.filter(r => r.status === 'Archived') : [];
 
-    const card = document.createElement('div');
-    card.className = 'mobile-card';
-    card.innerHTML = `
-      <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
-      <div class="mc-company">${r.company}</div>
-      <div class="mc-badges">${badge(r.direction)}${r.conviction?badge(r.conviction):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
-      ${r.catalyst?`<div class="mc-catalyst">&#9889; ${r.catalyst}</div>`:''}
-      ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
-      ${r.link?`<div style="margin-top:8px"><a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View Research</a></div>`:''}
-    `;
-    mobile.appendChild(card);
-  });
+  main.forEach(r => { tbody.appendChild(buildRow(r)); mobile.appendChild(buildCard(r)); });
+
+  if (archived.length) {
+    const chev = archivedExpanded ? '▲' : '▾';
+
+    const toggleRow = document.createElement('tr');
+    toggleRow.className = 'archived-toggle-row';
+    toggleRow.innerHTML = `<td colspan="${TABLE_COLSPAN}" onclick="toggleArchivedSection()"><span class="chev">${chev}</span>Archived Stocks (${archived.length})</td>`;
+    tbody.appendChild(toggleRow);
+
+    archived.forEach(r => {
+      const tr = buildRow(r);
+      tr.classList.add('archived-row');
+      if (!archivedExpanded) tr.classList.add('is-hidden');
+      tbody.appendChild(tr);
+    });
+
+    const toggleCard = document.createElement('div');
+    toggleCard.className = 'archived-toggle-card';
+    toggleCard.innerHTML = `<span class="chev">${chev}</span>Archived Stocks (${archived.length})`;
+    toggleCard.onclick = toggleArchivedSection;
+    mobile.appendChild(toggleCard);
+
+    archived.forEach(r => {
+      const card = buildCard(r);
+      card.classList.add('archived-row');
+      if (!archivedExpanded) card.classList.add('is-hidden');
+      mobile.appendChild(card);
+    });
+  }
 }
 
 // ── Main render ───────────────────────────────────────────────
