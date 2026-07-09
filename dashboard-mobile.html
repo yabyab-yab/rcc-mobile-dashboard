@@ -84,6 +84,9 @@
 
   /* CHARTS */
   .charts-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 12px; }
+
+  /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts */
+  .alerts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
   .chart-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
@@ -187,7 +190,7 @@
   }
   .doc-btn:hover { background: rgba(0,123,127,.3); }
   td.target-price { font-weight: 700; color: var(--text); white-space: nowrap; text-align: right; }
-  .stale-badge { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); margin-left: 4px; vertical-align: middle; title: "Not updated in 30+ days"; }
+  .stale-badge { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--amber); margin-left: 4px; vertical-align: middle; }
   .empty { text-align: center; padding: 40px; color: var(--muted); font-size: 13px; }
 
   /* Archived Stocks - collapsed section at the bottom of the table/cards */
@@ -290,6 +293,7 @@
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .kpi-row .kpi-card:last-child { grid-column: span 2; }
     .charts-row { grid-template-columns: 1fr; }
+    .alerts-row { grid-template-columns: 1fr; }
     .chart-wrap { min-height: 200px; }
     .catalyst, .thesis, .col-updated { display: none; }
     .company { display: none; }
@@ -488,13 +492,33 @@
     </div>
   </div>
 
-  <!-- PRIORITY ALERTS -->
-  <div class="activity-card priority-card">
-    <div class="activity-header">
-      <span class="title">&#128276; Priority Alerts</span>
-      <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
+  <!-- AT-A-GLANCE ROW: PRIORITY ALERTS + NEEDS ATTENTION + UPCOMING CATALYSTS -->
+  <div class="alerts-row">
+
+    <div class="activity-card priority-card">
+      <div class="activity-header">
+        <span class="title">&#128276; Priority Alerts</span>
+        <span style="font-size:10px;color:var(--muted)" id="priorityCount"></span>
+      </div>
+      <div class="activity-list" id="priorityList"></div>
     </div>
-    <div class="activity-list" id="priorityList"></div>
+
+    <div class="activity-card priority-card">
+      <div class="activity-header">
+        <span class="title">&#9888;&#65039; Needs Attention</span>
+        <span style="font-size:10px;color:var(--muted)" id="staleCount"></span>
+      </div>
+      <div class="activity-list" id="staleList"></div>
+    </div>
+
+    <div class="activity-card priority-card">
+      <div class="activity-header">
+        <span class="title">&#9889; Upcoming Catalysts</span>
+        <span style="font-size:10px;color:var(--muted)" id="catalystCount"></span>
+      </div>
+      <div class="activity-list" id="catalystList"></div>
+    </div>
+
   </div>
 
   <!-- PICKS TABLE -->
@@ -980,10 +1004,18 @@ function badge(val) {
   return `<span class="badge badge-${map[val]||''}">${val}</span>`;
 }
 
-function isStale(dateStr) {
-  if (!dateStr) return false;
+const STALE_DAYS = 14; // Active/Idea Pipeline picks untouched this long get flagged
+
+function daysSince(dateStr) {
+  if (!dateStr) return null;
   const d = new Date(dateStr);
-  return (Date.now() - d.getTime()) > 30 * 24 * 60 * 60 * 1000;
+  if (isNaN(d)) return null;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+
+function isStale(dateStr) {
+  const days = daysSince(dateStr);
+  return days !== null && days > STALE_DAYS;
 }
 
 function timeAgo(tsStr) {
@@ -1184,11 +1216,84 @@ function renderPriorityAlerts() {
   `).join('');
 }
 
+// ── Needs Attention (stale picks) ──────────────────────────────
+function getStaleAlerts() {
+  return STOCKS
+    .filter(r => r.status !== 'Archived' && isStale(r.date))
+    .map(r => ({ ...r, daysStale: daysSince(r.date) }))
+    .sort((a, b) => b.daysStale - a.daysStale)
+    .slice(0, 20);
+}
+
+function renderStaleAlerts() {
+  const list = document.getElementById('staleList');
+  const alerts = getStaleAlerts();
+  document.getElementById('staleCount').textContent = alerts.length ? `${alerts.length} picks` : '';
+
+  if (!alerts.length) {
+    list.innerHTML = `<div class="activity-empty">Nothing stale — everything's current within ${STALE_DAYS} days.</div>`;
+    return;
+  }
+
+  list.innerHTML = alerts.map(r => `
+    <div class="activity-item">
+      <div class="ai-top">
+        <span class="ai-ticker">${r.ticker}</span>
+        ${badge(r.status)}
+      </div>
+      <div class="ai-change">
+        <span class="ai-new">${r.company}</span>
+      </div>
+      <div class="ai-meta">${r.analyst} &nbsp;·&nbsp; ${r.daysStale}d since last update</div>
+    </div>
+  `).join('');
+}
+
+// ── Upcoming Catalysts ──────────────────────────────────────────
+function getUpcomingCatalysts() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  return STOCKS
+    .filter(r => r.status !== 'Archived')
+    .map(r => {
+      const d = nextCatalystDate(r.catalyst);
+      if (!d) return null;
+      const daysOut = Math.round((d - today) / 86400000);
+      return (daysOut >= 0 && daysOut <= 7) ? { ...r, daysOut } : null;
+    })
+    .filter(Boolean)
+    .sort((a, b) => a.daysOut - b.daysOut)
+    .slice(0, 20);
+}
+
+function renderUpcomingCatalysts() {
+  const list = document.getElementById('catalystList');
+  const items = getUpcomingCatalysts();
+  document.getElementById('catalystCount').textContent = items.length ? `${items.length} this week` : '';
+
+  if (!items.length) {
+    list.innerHTML = '<div class="activity-empty">No catalysts in the next 7 days.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(r => `
+    <div class="activity-item">
+      <div class="ai-top">
+        <span class="ai-ticker">${r.ticker}</span>
+        ${countdownBadge(r.catalyst)}
+      </div>
+      <div class="ai-change">
+        <span class="ai-new">${r.catalyst}</span>
+      </div>
+      <div class="ai-meta">${r.analyst} &nbsp;·&nbsp; ${r.company}</div>
+    </div>
+  `).join('');
+}
+
 // ── Table ─────────────────────────────────────────────────────
 const TABLE_COLSPAN = 16;
 
 function buildRow(r) {
-  const stale = isStale(r.date) ? '<span class="stale-badge" title="Not updated in 30+ days"></span>' : '';
+  const stale = (r.status !== 'Archived' && isStale(r.date)) ? `<span class="stale-badge" title="Not updated in ${STALE_DAYS}+ days"></span>` : '';
   const thesisExpanded = expandedTickers.has(r.ticker);
   const thesisInner = r.thesis ? (r.memo ? `<a class="thesis-link" href="${r.memo}" target="_blank" rel="noopener">${r.thesis}</a>` : r.thesis) : '<span class="badge-none">—</span>';
   const thesisHtml = r.thesis
@@ -1398,6 +1503,8 @@ document.getElementById('hdrDate').textContent =
 populateFilters();
 renderActivity();
 renderPriorityAlerts();
+renderStaleAlerts();
+renderUpcomingCatalysts();
 render();
 
 ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id =>
