@@ -83,7 +83,7 @@
   .kpi-sub   { font-size: 11px; color: var(--muted); }
 
   /* CHARTS */
-  .charts-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 12px; }
+  .charts-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 12px; }
 
   /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts */
   .alerts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
@@ -143,7 +143,7 @@
   table { width: 100%; border-collapse: collapse; font-size: 12px; }
   thead th {
     background: var(--navy2); color: var(--muted); font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .6px; padding: 10px 14px;
+    text-transform: uppercase; letter-spacing: .6px; padding: 8px 9px;
     text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border);
     cursor: pointer; user-select: none;
   }
@@ -153,9 +153,15 @@
   tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
   tbody tr:hover { background: var(--card2); }
   tbody tr:last-child { border-bottom: none; }
-  tbody td { padding: 10px 14px; color: var(--text); vertical-align: middle; }
+  /* Currently Held - live-position accent. A row-level cue (rather than its
+     own column) so it reads at a glance without adding table width. */
+  tr.held-row td { background: rgba(34,197,94,.055); }
+  tr.held-row td:first-child { box-shadow: inset 3px 0 0 var(--long); }
+  tr.held-row:hover td { background: rgba(34,197,94,.11); }
+  tbody td { padding: 8px 9px; color: var(--text); vertical-align: middle; }
   td.ticker  { font-weight: 800; color: var(--teal); font-size: 13px; white-space: nowrap; }
-  td.company { color: var(--muted); max-width: 180px; }
+  td.company { color: var(--muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.analyst-cell, td.sector-cell { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .badge {
     display: inline-block; padding: 3px 9px; border-radius: 20px;
     font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; white-space: nowrap;
@@ -177,8 +183,8 @@
   .badge-c0 { background: rgba(107,114,128,.12); color: var(--c0); border: 1px solid rgba(107,114,128,.2); }
   .badge-none     { color: var(--muted); font-size: 11px; }
   .badge-unassigned { background: rgba(167,139,250,.15); color: var(--c3); border: 1px solid rgba(167,139,250,.35); font-weight: 700; }
-  .catalyst { max-width: 200px; color: var(--muted); font-size: 11px; }
-  .thesis   { max-width: 240px; display: flex; align-items: flex-start; gap: 5px; }
+  .catalyst { max-width: 160px; color: var(--muted); font-size: 11px; }
+  .thesis-inner { max-width: 210px; display: flex; align-items: flex-start; gap: 5px; }
   .thesis-text { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
   .thesis-text.expanded { white-space: normal; overflow: visible; text-overflow: unset; }
   .thesis-toggle { flex-shrink: 0; cursor: pointer; color: var(--muted); font-size: 9px; line-height: 1.6; user-select: none; }
@@ -305,6 +311,7 @@
     .mobile-card {
       background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
     }
+    .mobile-card.held-row { border-left: 3px solid var(--long); background: rgba(34,197,94,.08); }
     .mc-top     { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .mc-ticker  { font-size: 16px; font-weight: 800; color: var(--teal); }
     .mc-company { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
@@ -546,7 +553,6 @@
               <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">▲</span></th>
               <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">▲</span></th>
               <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">▲</span></th>
-              <th onclick="sortBy('held')">Held <span class="sort-icon" id="si-held">▲</span></th>
               <th>Next Catalyst</th>
               <th>Thesis</th>
               <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
@@ -581,6 +587,10 @@
     <div class="chart-card">
       <div class="chart-title">Status Breakdown</div>
       <div class="chart-wrap"><canvas id="cStatus"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Currently Held</div>
+      <div class="chart-wrap"><canvas id="cHeld"></canvas></div>
     </div>
   </div>
 
@@ -655,7 +665,6 @@ const STOCKS = [
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes" }
 ];
-
 
 
 
@@ -814,7 +823,6 @@ const AUDIT = [
   { ts:"2026-07-07 16:25", user:"Kamaljit Gill", ticker:"RACE", field:"Target Price", oldVal:"234", newVal:"430" },
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"T", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" }
 ];
-
 
 
 
@@ -1175,6 +1183,13 @@ function updateCharts(data) {
     data:{ labels:['Active','Idea Pipeline','Archived'], datasets:[{ data:['Active','Idea Pipeline','Archived'].map(v=>count(data,'status',v)), backgroundColor:['rgba(34,197,94,.8)','rgba(96,165,250,.8)','rgba(107,114,128,.5)'], borderWidth:1, borderColor:'#162040' }] },
     options: DOUGHNUT
   });
+
+  destroyChart('held');
+  charts['held'] = new Chart(document.getElementById('cHeld'),{
+    type:'doughnut',
+    data:{ labels:['Held','Not Held'], datasets:[{ data:[count(data,'held','Yes'),count(data,'held','No')], backgroundColor:['rgba(34,197,94,.8)','rgba(107,114,128,.5)'], borderWidth:1, borderColor:'#162040' }] },
+    options: DOUGHNUT
+  });
 }
 
 // ── Activity Feed ─────────────────────────────────────────────
@@ -1338,7 +1353,7 @@ function renderUpcomingCatalysts() {
 }
 
 // ── Table ─────────────────────────────────────────────────────
-const TABLE_COLSPAN = 17;
+const TABLE_COLSPAN = 16;
 
 function buildRow(r) {
   const stale = (r.status !== 'Archived' && isStale(r.date)) ? `<span class="stale-badge" title="Not updated in ${STALE_DAYS}+ days"></span>` : '';
@@ -1351,28 +1366,28 @@ function buildRow(r) {
   tr.innerHTML = `
     <td style="text-align:center"><button class="star-btn ${isStarred(r.ticker)?'starred':''}" onclick="toggleStar('${r.ticker}')" title="${isStarred(r.ticker)?'Unstar':'Star'} this pick">${isStarred(r.ticker)?'★':'☆'}</button></td>
     <td class="ticker">${r.ticker}</td>
-    <td class="company">${r.company}</td>
+    <td class="company" title="${r.company}">${r.company}</td>
     <td>${badge(r.assignment)}</td>
     <td class="col-updated">${r.dateAdded||'<span class="badge-none">—</span>'}</td>
-    <td>${r.analyst}</td>
-    <td>${r.sector||'<span class="badge-none">—</span>'}</td>
+    <td class="analyst-cell" title="${r.analyst}">${r.analyst}</td>
+    <td class="sector-cell" title="${r.sector||''}">${r.sector||'<span class="badge-none">—</span>'}</td>
     <td>${badge(r.direction)}</td>
     <td>${badge(r.conviction)}</td>
     <td class="target-price">${formatTargetPrice(r.target) || '<span class="badge-none">—</span>'}</td>
     <td>${badge(r.status)}</td>
-    <td>${badge(r.held)}</td>
     <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
-    <td class="thesis">${thesisHtml}</td>
+    <td class="thesis"><div class="thesis-inner">${thesisHtml}</div></td>
     <td class="col-updated">${r.date}${stale}</td>
     <td>${r.link?`<a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View</a>`:'<span class="badge-none">—</span>'}</td>
     <td><button class="note-icon-btn" onclick="openNoteModal('${r.ticker}')">&#128172; Note</button></td>
   `;
+  if (r.held === 'Yes') tr.classList.add('held-row');
   return tr;
 }
 
 function buildCard(r) {
   const card = document.createElement('div');
-  card.className = 'mobile-card';
+  card.className = 'mobile-card' + (r.held === 'Yes' ? ' held-row' : '');
   card.innerHTML = `
     <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
     <div class="mc-company">${r.company}</div>
