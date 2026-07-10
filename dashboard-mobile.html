@@ -167,6 +167,8 @@
   .badge-archived { background: rgba(107,114,128,.12);color: var(--gray);  border: 1px solid rgba(107,114,128,.2); }
   .badge-self { background: rgba(0,123,127,.15);      color: var(--teal);  border: 1px solid rgba(0,123,127,.3); }
   .badge-pm   { background: rgba(96,165,250,.12);     color: var(--c4);    border: 1px solid rgba(96,165,250,.2); }
+  .badge-held-yes { background: rgba(34,197,94,.15);  color: var(--long);  border: 1px solid rgba(34,197,94,.3); }
+  .badge-held-no  { background: rgba(107,114,128,.12);color: var(--gray);  border: 1px solid rgba(107,114,128,.2); }
   .badge-c5 { background: rgba(34,197,94,.15);   color: var(--c5); border: 1px solid rgba(34,197,94,.3); }
   .badge-c4 { background: rgba(96,165,250,.12);  color: var(--c4); border: 1px solid rgba(96,165,250,.2); }
   .badge-c3 { background: rgba(167,139,250,.12); color: var(--c3); border: 1px solid rgba(167,139,250,.2); }
@@ -454,6 +456,7 @@
       <select id="fDirection"><option value="">All Directions</option><option>Long</option><option>Short</option></select>
       <select id="fConviction"><option value="">All Conviction</option><option value="5">5 – Highest</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1 – Lowest</option><option value="0">0 – Archived</option></select>
       <select id="fStatus"><option value="">All Statuses</option><option>Active</option><option>Idea Pipeline</option><option>Archived</option></select>
+      <select id="fHeld"><option value="">All (Held/Not Held)</option><option value="Yes">Currently Held</option><option value="No">Not Held</option></select>
       <select id="fCatalyst"><option value="">All Catalysts</option><option value="today">Catalyst Today</option><option value="week">Catalyst This Week</option><option value="month">Catalyst This Month</option></select>
     </div>
     <div class="filter-divider"></div>
@@ -543,6 +546,7 @@
               <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">▲</span></th>
               <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">▲</span></th>
               <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">▲</span></th>
+              <th onclick="sortBy('held')">Held <span class="sort-icon" id="si-held">▲</span></th>
               <th>Next Catalyst</th>
               <th>Thesis</th>
               <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
@@ -651,21 +655,6 @@ const STOCKS = [
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes" }
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -822,21 +811,6 @@ const AUDIT = [
   { ts:"2026-07-07 16:25", user:"Kamaljit Gill", ticker:"RACE", field:"Target Price", oldVal:"234", newVal:"430" },
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"T", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" }
 ];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1033,7 +1007,7 @@ function unique(arr, key) { return [...new Set(arr.map(d => d[key]).filter(Boole
 
 function badge(val) {
   if (!val) return '<span class="badge-none">—</span>';
-  const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', 5:'c5', 4:'c4', 3:'c3', 2:'c2', 1:'c1', 0:'c0', 'Self-Sourced':'self', 'PM-Assigned':'pm' };
+  const map = { Long:'long', Short:'short', Active:'active', 'Idea Pipeline':'pipeline', Archived:'archived', 5:'c5', 4:'c4', 3:'c3', 2:'c2', 1:'c1', 0:'c0', 'Self-Sourced':'self', 'PM-Assigned':'pm', Yes:'held-yes', No:'held-no' };
   return `<span class="badge badge-${map[val]||''}">${val}</span>`;
 }
 
@@ -1096,6 +1070,7 @@ function getFiltered() {
   const d  = document.getElementById('fDirection').value;
   const c  = document.getElementById('fConviction').value;
   const st = document.getElementById('fStatus').value;
+  const hd = document.getElementById('fHeld').value;
   const cat = document.getElementById('fCatalyst').value;
   const q  = (document.getElementById('searchBox').value || '').toLowerCase();
   return STOCKS.filter(r =>
@@ -1106,6 +1081,7 @@ function getFiltered() {
     (!d  || r.direction  === d)  &&
     (!c  || r.conviction === c)  &&
     (!st || r.status     === st) &&
+    (!hd || r.held       === hd) &&
     catalystInBucket(r.catalyst, cat) &&
     (!q  || r.ticker.toLowerCase().includes(q) || r.company.toLowerCase().includes(q))
   ).sort((a, b) => {
@@ -1356,7 +1332,7 @@ function renderUpcomingCatalysts() {
 }
 
 // ── Table ─────────────────────────────────────────────────────
-const TABLE_COLSPAN = 16;
+const TABLE_COLSPAN = 17;
 
 function buildRow(r) {
   const stale = (r.status !== 'Archived' && isStale(r.date)) ? `<span class="stale-badge" title="Not updated in ${STALE_DAYS}+ days"></span>` : '';
@@ -1378,6 +1354,7 @@ function buildRow(r) {
     <td>${badge(r.conviction)}</td>
     <td class="target-price">${formatTargetPrice(r.target) || '<span class="badge-none">—</span>'}</td>
     <td>${badge(r.status)}</td>
+    <td>${badge(r.held)}</td>
     <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
     <td class="thesis">${thesisHtml}</td>
     <td class="col-updated">${r.date}${stale}</td>
@@ -1393,7 +1370,7 @@ function buildCard(r) {
   card.innerHTML = `
     <div class="mc-top"><span class="mc-ticker">${r.ticker}</span>${badge(r.status)}</div>
     <div class="mc-company">${r.company}</div>
-    <div class="mc-badges">${badge(r.direction)}${r.conviction?badge(r.conviction):''}${r.assignment?badge(r.assignment):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
+    <div class="mc-badges">${badge(r.direction)}${badge(r.held)}${r.conviction?badge(r.conviction):''}${r.assignment?badge(r.assignment):''}<span style="font-size:10px;color:var(--muted)">${r.sector||''}</span></div>
     ${r.catalyst?`<div class="mc-catalyst">&#9889; ${r.catalyst}</div>`:''}
     ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
     ${r.dateAdded?`<div class="mc-meta" style="margin-top:4px">Initial date: ${r.dateAdded}</div>`:''}
@@ -1467,7 +1444,7 @@ function render() {
 }
 
 function resetFilters() {
-  ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id => document.getElementById(id).value='');
+  ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fHeld','fCatalyst'].forEach(id => document.getElementById(id).value='');
   document.getElementById('searchBox').value='';
   showStarredOnly = false;
   document.getElementById('starFilterBtn').classList.remove('active');
@@ -1573,7 +1550,7 @@ renderNeedsAttentionAlerts();
 renderUpcomingCatalysts();
 render();
 
-['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fCatalyst'].forEach(id =>
+['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fHeld','fCatalyst'].forEach(id =>
   document.getElementById(id).addEventListener('change', render)
 );
 </script>
