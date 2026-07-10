@@ -611,7 +611,7 @@
 
 <script>
 const STOCKS = [
-  { ticker:"LOW", company:"Lowe's Companies Inc.", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"5", target:"165 EUR", status:"Active", catalyst:"FOMC July 29 | HD Earnings Aug 18 | LOW Earnings Aug 19", thesis:"Stagnant Existing Home Sales; misguided M&A strategy", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LOW Presentation v.1.1.pptx?d=w3f3e06dce87d4ef38ca26d668bde1ac2&csf=1&web=1&e=Z33E85", memo:"" },
+  { ticker:"LOW", company:"Lowe's Companies Inc.", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"5", target:"165 USD", status:"Active", catalyst:"FOMC July 29 | HD Earnings Aug 18 | LOW Earnings Aug 19", thesis:"Stagnant Existing Home Sales; misguided M&A strategy", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LOW Presentation v.1.1.pptx?d=w3f3e06dce87d4ef38ca26d668bde1ac2&csf=1&web=1&e=Z33E85", memo:"" },
   { ticker:"LEN", company:"Lennar Corporation", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Housing", direction:"Short", conviction:"5", target:"70 USD", status:"Active", catalyst:"DHI Earnings July 21", thesis:"Housing Starts will disappoint; hits pace-over-price builder", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/LEN Discussion November 2025 v.1.1.pptx?d=w94431703a6c74f04ba84dcae4cb2a4c6&csf=1&web=1&e=TmQhpc", memo:"" },
   { ticker:"MS", company:"Morgan Stanley", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Long", conviction:"4", target:"255 USD", status:"Idea Pipeline", catalyst:"JPM and GS earnings July 14; MS July 15", thesis:"Weath Management leader; better capital markets activity", date:"2026-07-01", link:"", memo:"" },
   { ticker:"H", company:"Hyatt Hotels Corporation", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Leisure", direction:"Long", conviction:"4", target:"220 USD", status:"Idea Pipeline", catalyst:"HLT earns Jul 23; H earns July 30", thesis:"K Shape beneficiary; RevPar strenth; asset monetization", date:"2026-07-10", link:"", memo:"" },
@@ -650,7 +650,6 @@ const STOCKS = [
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earninsg early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"" }
 ];
-
 
 
 
@@ -807,7 +806,6 @@ const AUDIT = [
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"T", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" },
   { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"CMCSA", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" }
 ];
-
 
 
 
@@ -1009,7 +1007,17 @@ function badge(val) {
 }
 
 // Target Price may be entered as "165 USD", "70 EUR", or a bare number (defaults to USD).
-const CURRENCY_SYMBOLS = { USD:'$', EUR:'€', GBP:'£', JPY:'¥', CNY:'¥', CHF:'CHF ', CAD:'C$', AUD:'A$', HKD:'HK$', SEK:'kr', NOK:'kr', DKK:'kr' };
+const CURRENCY_SYMBOLS = {
+  USD:'$', EUR:'€', GBP:'£', JPY:'¥', CNY:'¥', CNH:'¥', CHF:'CHF ', CAD:'C$', AUD:'A$', NZD:'NZ$',
+  HKD:'HK$', SGD:'S$', INR:'₹', KRW:'₩', TWD:'NT$', THB:'฿', IDR:'Rp', MYR:'RM', PHP:'₱', VND:'₫',
+  BRL:'R$', MXN:'MX$', ARS:'AR$', CLP:'CLP$', COP:'COL$', PEN:'S/', ZAR:'R', TRY:'₺', ILS:'₪',
+  AED:'AED ', SAR:'SAR ', QAR:'QAR ', RUB:'₽', PLN:'zł', CZK:'Kč', HUF:'Ft', RON:'lei',
+  SEK:'kr', NOK:'kr', DKK:'kr', ISK:'kr', EGP:'E£', NGN:'₦', KES:'KSh', PKR:'₨', BDT:'৳', LKR:'Rs'
+};
+// A few symbols are shared by more than one currency (¥ = JPY/CNY/CNH, kr = SEK/NOK/DKK/ISK).
+// For those (and only those) we append the ISO code so a PM isn't guessing which currency it is.
+const SYMBOL_COUNTS = {};
+Object.values(CURRENCY_SYMBOLS).forEach(sym => { SYMBOL_COUNTS[sym] = (SYMBOL_COUNTS[sym] || 0) + 1; });
 function formatTargetPrice(target) {
   if (!target && target !== 0) return null;
   const s = String(target).trim();
@@ -1019,7 +1027,9 @@ function formatTargetPrice(target) {
   if (isNaN(num)) return null;
   const code = (m[2] || 'USD').toUpperCase();
   const symbol = CURRENCY_SYMBOLS[code] || (code + ' ');
-  return symbol + num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatted = num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const ambiguous = CURRENCY_SYMBOLS[code] && SYMBOL_COUNTS[symbol] > 1;
+  return symbol + formatted + (ambiguous ? ` (${code})` : '');
 }
 
 const STALE_DAYS = 14; // Active/Idea Pipeline picks untouched this long get flagged
