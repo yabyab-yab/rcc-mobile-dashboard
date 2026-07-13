@@ -290,6 +290,12 @@
   .return-badge { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:20px; font-size:10px; font-weight:800; white-space:nowrap; vertical-align:1px; cursor:default; }
   .return-badge.pos { background:rgba(34,197,94,.15);  color:var(--long);  border:1px solid rgba(34,197,94,.3); }
   .return-badge.neg { background:rgba(239,68,68,.15);  color:var(--short); border:1px solid rgba(239,68,68,.3); }
+  .legend-tip {
+    display:inline-flex; align-items:center; justify-content:center; width:14px; height:14px;
+    margin-left:7px; border-radius:50%; background:rgba(138,156,200,.18); color:var(--muted);
+    font-size:10px; font-weight:700; font-family:Georgia,serif; cursor:help; vertical-align:1px;
+  }
+  .legend-tip:hover { background:rgba(138,156,200,.32); color:var(--text); }
 
   /* STARRED FILTER & IC PRINT */
   .star-filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; font-family:inherit; }
@@ -559,7 +565,7 @@
   <!-- PICKS TABLE -->
   <div class="table-card">
       <div class="table-header">
-        <span class="title">Stock Picks</span>
+        <span class="title">Stock Picks<span class="legend-tip" title="The % badge next to a ticker is the return since initiation, direction-adjusted — for Shorts, a falling price counts as a gain. Green/positive always means the thesis is working; red/negative always means it isn't, regardless of Long or Short.">&#9432;</span></span>
         <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
       </div>
       <div class="table-wrap">
@@ -692,7 +698,6 @@ const STOCKS = [
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
-
 
 
 
@@ -857,7 +862,6 @@ const AUDIT = [
 
 
 
-
 // ── Thesis expand/collapse ──────────────────────────────────────
 let expandedTickers = new Set();
 function toggleThesis(ticker) {
@@ -937,7 +941,7 @@ function returnBadge(r) {
   const cls = v >= 0 ? 'pos' : 'neg';
   const sign = v >= 0 ? '+' : '';
   const dateBit = r.dateAdded ? ` on ${r.dateAdded}` : '';
-  const tip = (r.initPrice && r.livePrice) ? ` title="Since initiation${dateBit}: ${r.initPrice} → ${r.livePrice}"` : '';
+  const tip = (r.initPrice && r.livePrice) ? ` title="Return since initiation${dateBit} (direction-adjusted — green is favorable regardless of Long/Short): ${r.initPrice} → ${r.livePrice}"` : '';
   return `<span class="return-badge ${cls}"${tip}>${sign}${v.toFixed(1)}%</span>`;
 }
 
