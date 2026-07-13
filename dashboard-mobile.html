@@ -90,7 +90,7 @@
   .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
 
   /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts + Biggest Movers */
-  .alerts-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start; }
+  .alerts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
   .chart-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
@@ -159,9 +159,9 @@
   tbody tr:last-child { border-bottom: none; }
   /* Currently Held - live-position accent. A row-level cue (rather than its
      own column) so it reads at a glance without adding table width. */
-  tr.held-row td { background: rgba(34,197,94,.055); }
+  tr.held-row td { background: rgba(34,197,94,.1); }
   tr.held-row td:first-child { box-shadow: inset 3px 0 0 var(--long); }
-  tr.held-row:hover td { background: rgba(34,197,94,.11); }
+  tr.held-row:hover td { background: rgba(34,197,94,.16); }
   tbody td { padding: 8px 9px; color: var(--text); vertical-align: middle; }
   td.ticker  { font-weight: 800; color: var(--teal); font-size: 13px; white-space: nowrap; }
   td.company { color: var(--muted); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -302,10 +302,6 @@
   .target-progress-fill.neg { background:var(--short); }
   .target-progress-label { font-size:9px; color:var(--muted); margin-top:2px; white-space:nowrap; }
 
-  /* BIGGEST MOVERS alert card */
-  .pa-mover-pos { border-left: 3px solid var(--long); }
-  .pa-mover-neg { border-left: 3px solid var(--short); }
-
   /* STARRED FILTER & IC PRINT */
   .star-filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; font-family:inherit; }
   .star-filter-btn:hover { border-color:var(--amber); color:var(--amber); }
@@ -339,7 +335,7 @@
     .mobile-card {
       background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
     }
-    .mobile-card.held-row { border-left: 3px solid var(--long); background: rgba(34,197,94,.08); }
+    .mobile-card.held-row { border-left: 3px solid var(--long); background: rgba(34,197,94,.13); }
     .mc-top     { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
     .mc-ticker  { font-size: 16px; font-weight: 800; color: var(--teal); }
     .mc-company { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
@@ -529,16 +525,16 @@
       <div class="kpi-value" id="kShort" style="--kv:#EF4444">—</div>
       <div class="kpi-sub" id="kShortPct"></div>
     </div>
-    <!-- 2026-07-13: book-level return, held positions only, direction-adjusted -->
-    <div class="kpi-card" style="--accent:#22C55E">
-      <div class="kpi-label">Avg Return (Long, Held)</div>
-      <div class="kpi-value" id="kLongRet" style="--kv:#22C55E">—</div>
-      <div class="kpi-sub" id="kLongRetSub"></div>
+    <!-- 2026-07-13: assignment-source counts (Self-Sourced vs. PM-Assigned) -->
+    <div class="kpi-card" style="--accent:#00A8AD">
+      <div class="kpi-label">Self-Sourced Assignments</div>
+      <div class="kpi-value" id="kSelfSourced" style="--kv:#00A8AD">—</div>
+      <div class="kpi-sub" id="kSelfSourcedSub"></div>
     </div>
-    <div class="kpi-card" style="--accent:#EF4444">
-      <div class="kpi-label">Avg Return (Short, Held)</div>
-      <div class="kpi-value" id="kShortRet" style="--kv:#EF4444">—</div>
-      <div class="kpi-sub" id="kShortRetSub"></div>
+    <div class="kpi-card" style="--accent:#c084fc">
+      <div class="kpi-label">PM Assignments</div>
+      <div class="kpi-value" id="kPMAssigned" style="--kv:#c084fc">—</div>
+      <div class="kpi-sub" id="kPMAssignedSub"></div>
     </div>
   </div>
 
@@ -569,14 +565,6 @@
       <div class="activity-list" id="catalystList"></div>
     </div>
 
-    <div class="activity-card priority-card">
-      <div class="activity-header">
-        <span class="title">&#128200; Biggest Movers</span>
-        <span style="font-size:10px;color:var(--muted)" id="moversCount"></span>
-      </div>
-      <div class="activity-list" id="moversList"></div>
-    </div>
-
   </div>
 
   <!-- PICKS TABLE -->
@@ -600,6 +588,7 @@
               <th onclick="sortBy('conviction')">Conviction <span class="sort-icon" id="si-conviction">▲</span></th>
               <th onclick="sortBy('target')">Target Price <span class="sort-icon" id="si-target">▲</span></th>
               <th onclick="sortBy('status')">Status <span class="sort-icon" id="si-status">▲</span></th>
+              <th onclick="sortBy('held')">Held <span class="sort-icon" id="si-held">▲</span></th>
               <th>Next Catalyst</th>
               <th>Thesis</th>
               <th class="col-updated" onclick="sortBy('date')">Last Updated <span class="sort-icon" id="si-date">▲</span></th>
@@ -714,13 +703,6 @@ const STOCKS = [
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
-
-
-
-
-
-
-
 
 
 
@@ -879,13 +861,6 @@ const AUDIT = [
   { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Thesis / Notes", oldVal:"", newVal:"Distribution expansion driving long term market share" },
   { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Status", oldVal:"", newVal:"Active" }
 ];
-
-
-
-
-
-
-
 
 
 
@@ -1223,17 +1198,6 @@ function getFiltered() {
 
 function count(arr, key, val) { return arr.filter(r => r[key] === val).length; }
 
-// Held picks with a usable, direction-adjusted return - shared by the
-// book-return KPIs and Biggest Movers.
-function heldWithReturn(arr) {
-  return arr.filter(r => r.held === 'Yes' && r.returnPct !== '' && r.returnPct !== undefined && !isNaN(parseFloat(r.returnPct)))
-             .map(r => ({ ...r, returnPctNum: parseFloat(r.returnPct) }));
-}
-function avgReturn(rows) {
-  if (!rows.length) return null;
-  return rows.reduce((s,r) => s + r.returnPctNum, 0) / rows.length;
-}
-
 // ── KPIs ──────────────────────────────────────────────────────
 function updateKPIs(data) {
   const withDir = data.filter(r => r.direction);
@@ -1248,18 +1212,15 @@ function updateKPIs(data) {
   document.getElementById('kShortPct').textContent = pct(shorts);
   document.getElementById('resultCount').textContent = `${data.length} of ${STOCKS.length} picks`;
 
-  // 2026-07-13: book-level return, held positions only, direction-adjusted.
-  const heldRet = heldWithReturn(data);
-  const longRet  = avgReturn(heldRet.filter(r => r.direction === 'Long'));
-  const shortRet = avgReturn(heldRet.filter(r => r.direction === 'Short'));
-  const setRet = (valId, subId, val, n) => {
-    const el = document.getElementById(valId);
-    el.textContent = val === null ? '—' : `${val >= 0 ? '+' : ''}${val.toFixed(1)}%`;
-    el.style.setProperty('--kv', val === null ? '#8A9CC8' : (val >= 0 ? '#22C55E' : '#EF4444'));
-    document.getElementById(subId).textContent = n ? `${n} held position${n===1?'':'s'} w/ pricing` : 'no pricing data yet';
-  };
-  setRet('kLongRet',  'kLongRetSub',  longRet,  heldRet.filter(r => r.direction === 'Long').length);
-  setRet('kShortRet', 'kShortRetSub', shortRet, heldRet.filter(r => r.direction === 'Short').length);
+  // 2026-07-13: assignment-source counts (Self-Sourced vs. PM-Assigned),
+  // replacing the old book-return KPIs per PM feedback.
+  const selfSourced = count(data,'assignment','Self-Sourced');
+  const pmAssigned  = count(data,'assignment','PM-Assigned');
+  document.getElementById('kSelfSourced').textContent = selfSourced;
+  document.getElementById('kPMAssigned').textContent  = pmAssigned;
+  const asnPct = n => data.length ? `${Math.round(n/data.length*100)}% of shown picks` : '';
+  document.getElementById('kSelfSourcedSub').textContent = asnPct(selfSourced);
+  document.getElementById('kPMAssignedSub').textContent  = asnPct(pmAssigned);
 }
 
 // ── Charts ────────────────────────────────────────────────────
@@ -1492,44 +1453,8 @@ function renderUpcomingCatalysts() {
   `).join('');
 }
 
-// ── Biggest Movers (held picks, ranked by |Return Since Initiation|) ──
-const BIGGEST_MOVERS_LIMIT = 5;
-function getBiggestMovers() {
-  return heldWithReturn(STOCKS)
-    .sort((a, b) => Math.abs(b.returnPctNum) - Math.abs(a.returnPctNum))
-    .slice(0, BIGGEST_MOVERS_LIMIT);
-}
-
-function renderBiggestMovers() {
-  const list = document.getElementById('moversList');
-  const items = getBiggestMovers();
-  document.getElementById('moversCount').textContent = items.length ? `top ${items.length}` : '';
-
-  if (!items.length) {
-    list.innerHTML = '<div class="activity-empty">No held picks with both an initiation and a live price yet.</div>';
-    return;
-  }
-
-  list.innerHTML = items.map(r => {
-    const cls = r.returnPctNum >= 0 ? 'pos' : 'neg';
-    const sign = r.returnPctNum >= 0 ? '+' : '';
-    return `
-    <div class="activity-item pa-mover-${cls}">
-      <div class="ai-top">
-        <span class="ai-ticker">${r.ticker}</span>
-        <span class="return-badge ${cls}">${sign}${r.returnPctNum.toFixed(1)}%</span>
-      </div>
-      <div class="ai-change">
-        <span class="ai-new">${badge(r.direction)}</span>
-      </div>
-      <div class="ai-meta">${r.analyst} &nbsp;·&nbsp; ${r.company}</div>
-    </div>
-  `;
-  }).join('');
-}
-
 // ── Table ─────────────────────────────────────────────────────
-const TABLE_COLSPAN = 16;
+const TABLE_COLSPAN = 17;
 
 function buildRow(r) {
   const stale = (r.status !== 'Archived' && isStale(r.date)) ? `<span class="stale-badge" title="Not updated in ${STALE_DAYS}+ days"></span>` : '';
@@ -1551,6 +1476,7 @@ function buildRow(r) {
     <td>${badge(r.conviction)}</td>
     <td class="target-price">${formatTargetPrice(r.target) || '<span class="badge-none">—</span>'}${targetProgressHtml(r)}</td>
     <td>${badge(r.status)}</td>
+    <td>${badge(r.held)}</td>
     <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
     <td class="thesis"><div class="thesis-inner">${thesisHtml}</div></td>
     <td class="col-updated">${r.date}${stale}</td>
@@ -1746,7 +1672,6 @@ renderActivity();
 renderPriorityAlerts();
 renderNeedsAttentionAlerts();
 renderUpcomingCatalysts();
-renderBiggestMovers();
 render();
 
 ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fHeld','fCatalyst'].forEach(id =>
