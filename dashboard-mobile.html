@@ -712,7 +712,7 @@ const STOCKS = [
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes", returnPct:"-56.8", initPrice:"4.47", livePrice:"7.01" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes", returnPct:"3.3", initPrice:"19.28", livePrice:"18.65" },
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"UNP", company:"Union Paci", assignment:"", dateAdded:"2026-07-13", analyst:"", sector:"", direction:"", conviction:"", target:"", status:"", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
+  { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
 
 
@@ -724,7 +724,13 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-13 12:29", user:"Tehmur Jabbar", ticker:"UNP", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
+  { ts:"2026-07-13 12:29", user:"Tehmur Jabbar", ticker:"UNP", field:"Sector", oldVal:"", newVal:"Industrials" },
+  { ts:"2026-07-13 12:29", user:"Tehmur Jabbar", ticker:"UNP", field:"Analyst", oldVal:"", newVal:"Tehmur Jabbar" },
+  { ts:"2026-07-13 12:28", user:"Tehmur Jabbar", ticker:"UNP", field:"Assignments", oldVal:"", newVal:"PM-Assigned" },
+  { ts:"2026-07-13 12:28", user:"Tehmur Jabbar", ticker:"UNP", field:"Company Name", oldVal:"", newVal:"Union Pacific" },
   { ts:"2026-07-13 12:28", user:"Tehmur Jabbar", ticker:"UNP", field:"Company Name", oldVal:"", newVal:"Union Paci" },
   { ts:"2026-07-13 12:28", user:"Tehmur Jabbar", ticker:"UNP", field:"Ticker", oldVal:"", newVal:"UNP" },
   { ts:"2026-07-13 08:30", user:"Kamaljit Gill", ticker:"GIS", field:"Thesis / Notes", oldVal:"H2 margin degradation", newVal:"Incremental H2 margin degradation for an already unliked name" },
@@ -869,13 +875,9 @@ const AUDIT = [
   { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Ticker", oldVal:"", newVal:"RCI" },
   { ts:"2026-07-07 21:33", user:"Kamaljit Gill", ticker:"CMCSA", field:"Ticker", oldVal:"", newVal:"CMCSA" },
   { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Thesis / Notes", oldVal:"", newVal:"Distribution expansion driving long term market share" },
-  { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Status", oldVal:"", newVal:"Active" },
-  { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Conviction", oldVal:"", newVal:"High" },
-  { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Direction", oldVal:"", newVal:"Long" },
-  { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Sector", oldVal:"", newVal:"Consumer Staples" },
-  { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
-  { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Company Name", oldVal:"", newVal:"Turning Point Brands" }
+  { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Status", oldVal:"", newVal:"Active" }
 ];
+
 
 
 
