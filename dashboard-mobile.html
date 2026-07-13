@@ -87,14 +87,7 @@
   .kpi-sub   { font-size: 11px; color: var(--muted); }
 
   /* CHARTS */
-  /* auto-fit + wide/tall modifiers (added 2026-07-13 for the three new
-     return-based charts) so extra chart cards wrap onto additional rows
-     instead of overflowing the row width - same "wrap, never scroll"
-     rule as everywhere else on this dashboard. */
   .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
-  .chart-card.wide { grid-column: span 2; }
-  @media (max-width: 900px) { .chart-card.wide { grid-column: span 1; } }
-  .chart-wrap.tall { min-height: 260px; }
 
   /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts + Biggest Movers */
   .alerts-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start; }
@@ -645,23 +638,6 @@
     <div class="chart-card">
       <div class="chart-title">Currently Held</div>
       <div class="chart-wrap"><canvas id="cHeld"></canvas></div>
-    </div>
-    <!-- 2026-07-13: three new return-based charts, made possible by the
-         Live Pricing / Initiation Day Pricing tabs. "wide"+"tall" on the
-         two ranked-bar ones since they can have as many bars as there are
-         held picks / analysts - the auto-fit grid wraps these onto their
-         own row rather than squeezing or scrolling. -->
-    <div class="chart-card wide">
-      <div class="chart-title">Winners / Losers Since Initiation (Held)</div>
-      <div class="chart-wrap tall"><canvas id="cMovers"></canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Conviction vs. Return (Held)</div>
-      <div class="chart-wrap"><canvas id="cConvReturn"></canvas></div>
-    </div>
-    <div class="chart-card wide">
-      <div class="chart-title">Avg Return by Analyst (Held)</div>
-      <div class="chart-wrap tall"><canvas id="cAnalystReturn"></canvas></div>
     </div>
   </div>
 
@@ -1233,7 +1209,7 @@ function getFiltered() {
 function count(arr, key, val) { return arr.filter(r => r[key] === val).length; }
 
 // Held picks with a usable, direction-adjusted return - shared by the
-// book-return KPIs, the Winners/Losers chart, and Biggest Movers.
+// book-return KPIs and Biggest Movers.
 function heldWithReturn(arr) {
   return arr.filter(r => r.held === 'Yes' && r.returnPct !== '' && r.returnPct !== undefined && !isNaN(parseFloat(r.returnPct)))
              .map(r => ({ ...r, returnPctNum: parseFloat(r.returnPct) }));
@@ -1338,83 +1314,6 @@ function updateCharts(data) {
     type:'doughnut',
     data:{ labels:['Held','Not Held'], datasets:[{ data:[count(data,'held','Yes'),count(data,'held','No')], backgroundColor:['rgba(34,197,94,.8)','rgba(107,114,128,.5)'], borderWidth:1, borderColor:'#162040' }] },
     options: DOUGHNUT
-  });
-
-  // 2026-07-13: three new return-based charts (see heldWithReturn/avgReturn
-  // above). All three are empty-safe - if no held pick has both an
-  // initiation and a live price yet, they render with zero bars/points
-  // rather than erroring.
-  const heldRet = heldWithReturn(data);
-
-  destroyChart('movers');
-  const moversSorted = [...heldRet].sort((a,b) => b.returnPctNum - a.returnPctNum);
-  charts['movers'] = new Chart(document.getElementById('cMovers'), {
-    type: 'bar',
-    data: {
-      labels: moversSorted.map(r => r.ticker),
-      datasets: [{
-        data: moversSorted.map(r => r.returnPctNum),
-        backgroundColor: moversSorted.map(r => r.returnPctNum >= 0 ? 'rgba(34,197,94,.75)' : 'rgba(239,68,68,.75)'),
-        borderRadius: 3
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: { legend: { display:false }, tooltip: { callbacks: { label: c => `${c.raw>=0?'+':''}${c.raw.toFixed(1)}%` } } },
-      scales: {
-        x: { ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} },
-        y: { ticks:{color:'#8A9CC8',font:{size:10}}, grid:{display:false} }
-      },
-      maintainAspectRatio: false, animation:{duration:400}
-    }
-  });
-
-  destroyChart('convret');
-  charts['convret'] = new Chart(document.getElementById('cConvReturn'), {
-    type: 'scatter',
-    data: {
-      datasets: [
-        { label:'Long',  data: heldRet.filter(r=>r.direction==='Long').map(r=>({x:Number(r.conviction)||0, y:r.returnPctNum, ticker:r.ticker})),  backgroundColor:'rgba(34,197,94,.75)' },
-        { label:'Short', data: heldRet.filter(r=>r.direction==='Short').map(r=>({x:Number(r.conviction)||0, y:r.returnPctNum, ticker:r.ticker})), backgroundColor:'rgba(239,68,68,.75)' }
-      ]
-    },
-    options: {
-      plugins: {
-        legend: { display:true, position:'top', labels:{color:'#8A9CC8',font:{size:10},boxWidth:10,padding:8} },
-        tooltip: { callbacks: { label: c => `${c.raw.ticker}: conviction ${c.raw.x}, ${c.raw.y>=0?'+':''}${c.raw.y.toFixed(1)}%` } }
-      },
-      scales: {
-        x: { title:{display:true,text:'Conviction',color:'#8A9CC8',font:{size:10}}, min:-0.5, max:5.5, ticks:{color:'#8A9CC8',font:{size:9},stepSize:1}, grid:{color:'rgba(38,54,96,.5)'} },
-        y: { title:{display:true,text:'Return %',color:'#8A9CC8',font:{size:10}}, ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} }
-      },
-      maintainAspectRatio: false, animation:{duration:400}
-    }
-  });
-
-  destroyChart('analystret');
-  const byAnalyst = unique(heldRet,'analyst');
-  const analystAvgs = byAnalyst
-    .map(a => ({ analyst:a, avg: avgReturn(heldRet.filter(r=>r.analyst===a)), n: heldRet.filter(r=>r.analyst===a).length }))
-    .sort((a,b) => b.avg - a.avg);
-  charts['analystret'] = new Chart(document.getElementById('cAnalystReturn'), {
-    type: 'bar',
-    data: {
-      labels: analystAvgs.map(a => `${a.analyst} (${a.n})`),
-      datasets: [{
-        data: analystAvgs.map(a => a.avg),
-        backgroundColor: analystAvgs.map(a => a.avg >= 0 ? 'rgba(34,197,94,.75)' : 'rgba(239,68,68,.75)'),
-        borderRadius: 3
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      plugins: { legend: { display:false }, tooltip: { callbacks: { label: c => `${c.raw>=0?'+':''}${c.raw.toFixed(1)}% avg` } } },
-      scales: {
-        x: { ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} },
-        y: { ticks:{color:'#8A9CC8',font:{size:10}}, grid:{display:false} }
-      },
-      maintainAspectRatio: false, animation:{duration:400}
-    }
   });
 }
 
