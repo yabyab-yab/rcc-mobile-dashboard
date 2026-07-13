@@ -644,7 +644,7 @@ const STOCKS = [
   { ticker:"CPNG", company:"Coupang", assignment:"PM-Assigned", dateAdded:"2026-04-15", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"0", target:"", status:"Archived", catalyst:"", thesis:"Long-term compounder facing bad headlines", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Indivior Investment Case_v2026.01.26.docx?d=w4d32dd19a6714c799833eea395916019&csf=1&web=1&e=JMXXV8", memo:"", held:"No" },
   { ticker:"INDV", company:"Indivior", assignment:"PM-Assigned", dateAdded:"", analyst:"Kamaljit Gill", sector:"Healthcare", direction:"Long", conviction:"0", target:"", status:"Archived", catalyst:"", thesis:"Self help + shareholder friendly capital deployment", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/CPNG Investment Case (Apr 2026).pptx?d=w773772e6a1d749e4ba01e0c588d2cdec&csf=1&web=1&e=3Hrh2A", memo:"", held:"No" },
   { ticker:"TPB", company:"Turning Point Brands", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Long", conviction:"5", target:"160 USD", status:"Active", catalyst:"", thesis:"Distribution expansion driving long term market share", date:"2026-07-10", link:"", memo:"", held:"Yes" },
-  { ticker:"ATZ", company:"Aritzia", assignment:"Self-Sourced", dateAdded:"2026-04-30", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"200 USD", status:"Active", catalyst:"Q2 Earnings July 9", thesis:"High brand heat, unit growth story, GLP-1 demand upside", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/ATZ (2026.05.01).pptx?d=w46a4707ca5764c328afddc9c3e1a02f3&csf=1&web=1&e=9klcGT", memo:"", held:"Yes" },
+  { ticker:"ATZ", company:"Aritzia", assignment:"Self-Sourced", dateAdded:"2026-04-30", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"200 USD", status:"Active", catalyst:"Q3 Earnings", thesis:"High brand heat, unit growth story, GLP-1 demand upside", date:"2026-07-13", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/ATZ (2026.05.01).pptx?d=w46a4707ca5764c328afddc9c3e1a02f3&csf=1&web=1&e=9klcGT", memo:"", held:"Yes" },
   { ticker:"RACE", company:"Ferrari NV", assignment:"PM-Assigned", dateAdded:"2026-06-30", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"", status:"Active", catalyst:"Q2 Earnings July 30", thesis:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Race Investment Case June 2026.docx?d=w342cc5ab68e240a09ce08cb064739a01&csf=1&web=1&e=EEaSv4", memo:"", held:"Yes" },
   { ticker:"CMCSA", company:"Comcast", assignment:"PM-Assigned", dateAdded:"2026-05-15", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15 USD", status:"Active", catalyst:"Q2 Earnings July 23", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"Yes" },
   { ticker:"T", company:"AT&T", assignment:"PM-Assigned", dateAdded:"2026-05-15", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15 USD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"Yes" },
@@ -671,7 +671,10 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"Q3 Earnings" },
+  { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"" },
   { ts:"2026-07-10 14:42", user:"Khaled Beydoun", ticker:"EQPT", field:"Assignments", oldVal:"", newVal:"PM-Assigned" },
   { ts:"2026-07-10 10:18", user:"Youssef Ait Boulahri", ticker:"LOW", field:"Target Price", oldVal:"165 USD", newVal:"165" },
   { ts:"2026-07-10 10:18", user:"Youssef Ait Boulahri", ticker:"LEN", field:"Target Price", oldVal:"70 EUR", newVal:"70" },
@@ -819,10 +822,9 @@ const AUDIT = [
   { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Sector", oldVal:"", newVal:"Information Technology" },
   { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
   { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Company Name", oldVal:"", newVal:"Ncino" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Ticker", oldVal:"", newVal:"NCNO" },
-  { ts:"2026-07-07 16:25", user:"Kamaljit Gill", ticker:"RACE", field:"Target Price", oldVal:"234", newVal:"430" },
-  { ts:"2026-07-07 16:10", user:"Kamaljit Gill", ticker:"T", field:"Next Catalyst", oldVal:"Q2 Earnings July 17", newVal:"" }
+  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Ticker", oldVal:"", newVal:"NCNO" }
 ];
+
 
 
 
