@@ -296,6 +296,17 @@
     font-size:10px; font-weight:700; font-family:Georgia,serif; cursor:help; vertical-align:1px;
   }
   .legend-tip:hover { background:rgba(138,156,200,.32); color:var(--text); }
+  /* Return isn't a table column (see note above), so sorting by it is a
+     standalone control in the table header rather than a <th> click. */
+  .sort-return-btn {
+    background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px;
+    padding:5px 10px; border-radius:6px; cursor:pointer; font-family:inherit; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:5px; transition:all .2s;
+  }
+  .sort-return-btn:hover { border-color:var(--teal); color:var(--teal); }
+  .sort-return-btn.sorted { border-color:var(--teal); color:var(--teal); background:rgba(0,123,127,.1); }
+  .sort-return-btn .sort-icon { font-size:9px; opacity:.6; }
+  .sort-return-btn.sorted .sort-icon { opacity:1; }
 
   /* STARRED FILTER & IC PRINT */
   .star-filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; font-family:inherit; }
@@ -566,7 +577,10 @@
   <div class="table-card">
       <div class="table-header">
         <span class="title">Stock Picks<span class="legend-tip" title="The % badge next to a ticker is the return since initiation, direction-adjusted — for Shorts, a falling price counts as a gain. Green/positive always means the thesis is working; red/negative always means it isn't, regardless of Long or Short.">&#9432;</span></span>
-        <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="sort-return-btn" id="sortReturnBtn" onclick="sortBy('returnPct')" title="Sort by Return Since Initiation (direction-adjusted; held picks with pricing data first)">Sort by Return <span class="sort-icon" id="si-returnPct">▲</span></button>
+          <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
+        </div>
       </div>
       <div class="table-wrap">
         <table>
@@ -698,7 +712,6 @@ const STOCKS = [
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
-
 
 
 
@@ -857,7 +870,6 @@ const AUDIT = [
   { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Thesis / Notes", oldVal:"", newVal:"Distribution expansion driving long term market share" },
   { ts:"2026-07-07 21:32", user:"Kamaljit Gill", ticker:"TPB", field:"Status", oldVal:"", newVal:"Active" }
 ];
-
 
 
 
@@ -1058,10 +1070,11 @@ let sortKey = 'date', sortDir = -1;
 function sortBy(key) {
   if (sortKey === key) sortDir *= -1;
   else { sortKey = key; sortDir = 1; }
-  document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+  document.querySelectorAll('thead th, .sort-return-btn').forEach(el => el.classList.remove('sorted'));
   const si = document.getElementById('si-' + key);
   if (si) {
-    si.closest('th').classList.add('sorted');
+    const container = si.closest('th') || si.closest('.sort-return-btn');
+    if (container) container.classList.add('sorted');
     si.textContent = sortDir === 1 ? '▲' : '▼';
   }
   render();
@@ -1150,6 +1163,17 @@ function getFiltered() {
     catalystInBucket(r.catalyst, cat) &&
     (!q  || r.ticker.toLowerCase().includes(q) || r.company.toLowerCase().includes(q))
   ).sort((a, b) => {
+    if (sortKey === 'returnPct') {
+      // Direction-adjusted return isn't a plain string field, and picks
+      // with no pricing data (returnPct === '') should always sort to the
+      // bottom rather than jumping to the top on a descending sort.
+      const av = parseFloat(a.returnPct), bv = parseFloat(b.returnPct);
+      const aMissing = isNaN(av), bMissing = isNaN(bv);
+      if (aMissing && bMissing) return 0;
+      if (aMissing) return 1;
+      if (bMissing) return -1;
+      return (av - bv) * sortDir;
+    }
     const av = (a[sortKey] || '').toString().toLowerCase();
     const bv = (b[sortKey] || '').toString().toLowerCase();
     return av < bv ? -sortDir : av > bv ? sortDir : 0;
