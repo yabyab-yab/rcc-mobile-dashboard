@@ -71,7 +71,11 @@
   main { padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; }
 
   /* KPI CARDS */
-  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+  /* repeat(auto-fit, minmax(...)) rather than a fixed count so the two
+     book-return cards (added 2026-07-13) just wrap onto their own row on
+     narrower screens instead of squeezing everything or forcing a
+     horizontal scrollbar. */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
   .kpi-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 16px 18px; display: flex; flex-direction: column; gap: 4px;
@@ -83,10 +87,17 @@
   .kpi-sub   { font-size: 11px; color: var(--muted); }
 
   /* CHARTS */
-  .charts-row { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr 1fr; gap: 12px; }
+  /* auto-fit + wide/tall modifiers (added 2026-07-13 for the three new
+     return-based charts) so extra chart cards wrap onto additional rows
+     instead of overflowing the row width - same "wrap, never scroll"
+     rule as everywhere else on this dashboard. */
+  .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .chart-card.wide { grid-column: span 2; }
+  @media (max-width: 900px) { .chart-card.wide { grid-column: span 1; } }
+  .chart-wrap.tall { min-height: 260px; }
 
-  /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts */
-  .alerts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; align-items: start; }
+  /* AT-A-GLANCE ROW: Priority Alerts + Needs Attention + Upcoming Catalysts + Biggest Movers */
+  .alerts-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start; }
   .chart-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 10px;
     padding: 16px; display: flex; flex-direction: column; gap: 10px;
@@ -286,6 +297,21 @@
   .return-badge { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:20px; font-size:10px; font-weight:800; white-space:nowrap; vertical-align:1px; cursor:default; }
   .return-badge.pos { background:rgba(34,197,94,.15);  color:var(--long);  border:1px solid rgba(34,197,94,.3); }
   .return-badge.neg { background:rgba(239,68,68,.15);  color:var(--short); border:1px solid rgba(239,68,68,.3); }
+
+  /* PROGRESS TO TARGET - % of the initiation-to-target distance already
+     covered by the live price, direction-adjusted. Shown as a thin bar
+     under the Target Price cell (held picks with a live price only), not
+     a new column, for the same no-added-width reason as the return badge. */
+  .target-progress { margin-top:4px; width:64px; }
+  .target-progress-track { height:4px; border-radius:3px; background:rgba(138,156,200,.18); overflow:hidden; }
+  .target-progress-fill { height:100%; border-radius:3px; }
+  .target-progress-fill.pos { background:var(--long); }
+  .target-progress-fill.neg { background:var(--short); }
+  .target-progress-label { font-size:9px; color:var(--muted); margin-top:2px; white-space:nowrap; }
+
+  /* BIGGEST MOVERS alert card */
+  .pa-mover-pos { border-left: 3px solid var(--long); }
+  .pa-mover-neg { border-left: 3px solid var(--short); }
 
   /* STARRED FILTER & IC PRINT */
   .star-filter-btn { background:transparent; border:1px solid var(--border); color:var(--muted); font-size:11px; padding:5px 12px; border-radius:6px; cursor:pointer; transition:all .2s; font-family:inherit; }
@@ -510,9 +536,20 @@
       <div class="kpi-value" id="kShort" style="--kv:#EF4444">—</div>
       <div class="kpi-sub" id="kShortPct"></div>
     </div>
+    <!-- 2026-07-13: book-level return, held positions only, direction-adjusted -->
+    <div class="kpi-card" style="--accent:#22C55E">
+      <div class="kpi-label">Avg Return (Long, Held)</div>
+      <div class="kpi-value" id="kLongRet" style="--kv:#22C55E">—</div>
+      <div class="kpi-sub" id="kLongRetSub"></div>
+    </div>
+    <div class="kpi-card" style="--accent:#EF4444">
+      <div class="kpi-label">Avg Return (Short, Held)</div>
+      <div class="kpi-value" id="kShortRet" style="--kv:#EF4444">—</div>
+      <div class="kpi-sub" id="kShortRetSub"></div>
+    </div>
   </div>
 
-  <!-- AT-A-GLANCE ROW: PRIORITY ALERTS + NEEDS ATTENTION + UPCOMING CATALYSTS -->
+  <!-- AT-A-GLANCE ROW: PRIORITY ALERTS + NEEDS ATTENTION + UPCOMING CATALYSTS + BIGGEST MOVERS -->
   <div class="alerts-row">
 
     <div class="activity-card priority-card">
@@ -537,6 +574,14 @@
         <span style="font-size:10px;color:var(--muted)" id="catalystCount"></span>
       </div>
       <div class="activity-list" id="catalystList"></div>
+    </div>
+
+    <div class="activity-card priority-card">
+      <div class="activity-header">
+        <span class="title">&#128200; Biggest Movers</span>
+        <span style="font-size:10px;color:var(--muted)" id="moversCount"></span>
+      </div>
+      <div class="activity-list" id="moversList"></div>
     </div>
 
   </div>
@@ -600,6 +645,23 @@
     <div class="chart-card">
       <div class="chart-title">Currently Held</div>
       <div class="chart-wrap"><canvas id="cHeld"></canvas></div>
+    </div>
+    <!-- 2026-07-13: three new return-based charts, made possible by the
+         Live Pricing / Initiation Day Pricing tabs. "wide"+"tall" on the
+         two ranked-bar ones since they can have as many bars as there are
+         held picks / analysts - the auto-fit grid wraps these onto their
+         own row rather than squeezing or scrolling. -->
+    <div class="chart-card wide">
+      <div class="chart-title">Winners / Losers Since Initiation (Held)</div>
+      <div class="chart-wrap tall"><canvas id="cMovers"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Conviction vs. Return (Held)</div>
+      <div class="chart-wrap"><canvas id="cConvReturn"></canvas></div>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-title">Avg Return by Analyst (Held)</div>
+      <div class="chart-wrap tall"><canvas id="cAnalystReturn"></canvas></div>
     </div>
   </div>
 
@@ -675,8 +737,6 @@ const STOCKS = [
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes", returnPct:"3.3", initPrice:"19.28", livePrice:"18.65" },
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"2026-07-13", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
-
-
 
 
 
@@ -835,8 +895,6 @@ const AUDIT = [
   { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Ticker", oldVal:"", newVal:"TPB" },
   { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue growth acceleration - organic + AI", newVal:"Revenue growth acceleration - organic + new AI product" }
 ];
-
-
 
 
 
@@ -1080,6 +1138,44 @@ function formatTargetPrice(target) {
   return symbol + formatted + (ambiguous ? ` (${code})` : '');
 }
 
+// Same parse as formatTargetPrice, but returns the bare number (no
+// currency handling) for use in the Progress to Target math below.
+function parseTargetNumeric(target) {
+  if (!target && target !== 0) return null;
+  const m = String(target).trim().match(/^([\d,.]+)\s*([A-Za-z]{3})?$/);
+  if (!m) return null;
+  const num = parseFloat(m[1].replace(/,/g, ''));
+  return isNaN(num) ? null : num;
+}
+
+// Progress to Target - what fraction of the initiation-to-target distance
+// the live price has already covered, direction-adjusted. Unlike Return
+// Since Initiation, this needs a target price too, so it's a separate
+// (smaller) set of held picks that qualify. >100% means price has passed
+// the target; negative means it's moved the wrong way since initiation.
+function targetProgress(r) {
+  if (r.held !== 'Yes' || !r.initPrice || !r.livePrice) return null;
+  const target = parseTargetNumeric(r.target);
+  if (target === null) return null;
+  const init = parseFloat(r.initPrice), live = parseFloat(r.livePrice);
+  const denom = r.direction === 'Short' ? (init - target) : (target - init);
+  if (!denom) return null; // target === init, avoid divide-by-zero
+  const moved = r.direction === 'Short' ? (init - live) : (live - init);
+  const pct = (moved / denom) * 100;
+  return { pct, cls: pct >= 0 ? 'pos' : 'neg' };
+}
+
+function targetProgressHtml(r) {
+  const p = targetProgress(r);
+  if (!p) return '';
+  const capped = Math.max(-15, Math.min(115, p.pct)); // keep the fill bar sane on big overshoots
+  const fillPct = Math.max(0, Math.min(100, capped < 0 ? 0 : capped));
+  return `<div class="target-progress" title="Progress from initiation price to target: ${p.pct.toFixed(0)}%">
+    <div class="target-progress-track"><div class="target-progress-fill ${p.cls}" style="width:${fillPct}%"></div></div>
+    <div class="target-progress-label">${p.pct.toFixed(0)}% to target</div>
+  </div>`;
+}
+
 const STALE_DAYS = 14; // Active/Idea Pipeline picks untouched this long get flagged
 
 function daysSince(dateStr) {
@@ -1136,6 +1232,17 @@ function getFiltered() {
 
 function count(arr, key, val) { return arr.filter(r => r[key] === val).length; }
 
+// Held picks with a usable, direction-adjusted return - shared by the
+// book-return KPIs, the Winners/Losers chart, and Biggest Movers.
+function heldWithReturn(arr) {
+  return arr.filter(r => r.held === 'Yes' && r.returnPct !== '' && r.returnPct !== undefined && !isNaN(parseFloat(r.returnPct)))
+             .map(r => ({ ...r, returnPctNum: parseFloat(r.returnPct) }));
+}
+function avgReturn(rows) {
+  if (!rows.length) return null;
+  return rows.reduce((s,r) => s + r.returnPctNum, 0) / rows.length;
+}
+
 // ── KPIs ──────────────────────────────────────────────────────
 function updateKPIs(data) {
   const withDir = data.filter(r => r.direction);
@@ -1149,6 +1256,19 @@ function updateKPIs(data) {
   document.getElementById('kLongPct').textContent  = pct(longs);
   document.getElementById('kShortPct').textContent = pct(shorts);
   document.getElementById('resultCount').textContent = `${data.length} of ${STOCKS.length} picks`;
+
+  // 2026-07-13: book-level return, held positions only, direction-adjusted.
+  const heldRet = heldWithReturn(data);
+  const longRet  = avgReturn(heldRet.filter(r => r.direction === 'Long'));
+  const shortRet = avgReturn(heldRet.filter(r => r.direction === 'Short'));
+  const setRet = (valId, subId, val, n) => {
+    const el = document.getElementById(valId);
+    el.textContent = val === null ? '—' : `${val >= 0 ? '+' : ''}${val.toFixed(1)}%`;
+    el.style.setProperty('--kv', val === null ? '#8A9CC8' : (val >= 0 ? '#22C55E' : '#EF4444'));
+    document.getElementById(subId).textContent = n ? `${n} held position${n===1?'':'s'} w/ pricing` : 'no pricing data yet';
+  };
+  setRet('kLongRet',  'kLongRetSub',  longRet,  heldRet.filter(r => r.direction === 'Long').length);
+  setRet('kShortRet', 'kShortRetSub', shortRet, heldRet.filter(r => r.direction === 'Short').length);
 }
 
 // ── Charts ────────────────────────────────────────────────────
@@ -1218,6 +1338,83 @@ function updateCharts(data) {
     type:'doughnut',
     data:{ labels:['Held','Not Held'], datasets:[{ data:[count(data,'held','Yes'),count(data,'held','No')], backgroundColor:['rgba(34,197,94,.8)','rgba(107,114,128,.5)'], borderWidth:1, borderColor:'#162040' }] },
     options: DOUGHNUT
+  });
+
+  // 2026-07-13: three new return-based charts (see heldWithReturn/avgReturn
+  // above). All three are empty-safe - if no held pick has both an
+  // initiation and a live price yet, they render with zero bars/points
+  // rather than erroring.
+  const heldRet = heldWithReturn(data);
+
+  destroyChart('movers');
+  const moversSorted = [...heldRet].sort((a,b) => b.returnPctNum - a.returnPctNum);
+  charts['movers'] = new Chart(document.getElementById('cMovers'), {
+    type: 'bar',
+    data: {
+      labels: moversSorted.map(r => r.ticker),
+      datasets: [{
+        data: moversSorted.map(r => r.returnPctNum),
+        backgroundColor: moversSorted.map(r => r.returnPctNum >= 0 ? 'rgba(34,197,94,.75)' : 'rgba(239,68,68,.75)'),
+        borderRadius: 3
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display:false }, tooltip: { callbacks: { label: c => `${c.raw>=0?'+':''}${c.raw.toFixed(1)}%` } } },
+      scales: {
+        x: { ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} },
+        y: { ticks:{color:'#8A9CC8',font:{size:10}}, grid:{display:false} }
+      },
+      maintainAspectRatio: false, animation:{duration:400}
+    }
+  });
+
+  destroyChart('convret');
+  charts['convret'] = new Chart(document.getElementById('cConvReturn'), {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label:'Long',  data: heldRet.filter(r=>r.direction==='Long').map(r=>({x:Number(r.conviction)||0, y:r.returnPctNum, ticker:r.ticker})),  backgroundColor:'rgba(34,197,94,.75)' },
+        { label:'Short', data: heldRet.filter(r=>r.direction==='Short').map(r=>({x:Number(r.conviction)||0, y:r.returnPctNum, ticker:r.ticker})), backgroundColor:'rgba(239,68,68,.75)' }
+      ]
+    },
+    options: {
+      plugins: {
+        legend: { display:true, position:'top', labels:{color:'#8A9CC8',font:{size:10},boxWidth:10,padding:8} },
+        tooltip: { callbacks: { label: c => `${c.raw.ticker}: conviction ${c.raw.x}, ${c.raw.y>=0?'+':''}${c.raw.y.toFixed(1)}%` } }
+      },
+      scales: {
+        x: { title:{display:true,text:'Conviction',color:'#8A9CC8',font:{size:10}}, min:-0.5, max:5.5, ticks:{color:'#8A9CC8',font:{size:9},stepSize:1}, grid:{color:'rgba(38,54,96,.5)'} },
+        y: { title:{display:true,text:'Return %',color:'#8A9CC8',font:{size:10}}, ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} }
+      },
+      maintainAspectRatio: false, animation:{duration:400}
+    }
+  });
+
+  destroyChart('analystret');
+  const byAnalyst = unique(heldRet,'analyst');
+  const analystAvgs = byAnalyst
+    .map(a => ({ analyst:a, avg: avgReturn(heldRet.filter(r=>r.analyst===a)), n: heldRet.filter(r=>r.analyst===a).length }))
+    .sort((a,b) => b.avg - a.avg);
+  charts['analystret'] = new Chart(document.getElementById('cAnalystReturn'), {
+    type: 'bar',
+    data: {
+      labels: analystAvgs.map(a => `${a.analyst} (${a.n})`),
+      datasets: [{
+        data: analystAvgs.map(a => a.avg),
+        backgroundColor: analystAvgs.map(a => a.avg >= 0 ? 'rgba(34,197,94,.75)' : 'rgba(239,68,68,.75)'),
+        borderRadius: 3
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      plugins: { legend: { display:false }, tooltip: { callbacks: { label: c => `${c.raw>=0?'+':''}${c.raw.toFixed(1)}% avg` } } },
+      scales: {
+        x: { ticks:{color:'#8A9CC8',font:{size:9},callback:v=>v+'%'}, grid:{color:'rgba(38,54,96,.5)'} },
+        y: { ticks:{color:'#8A9CC8',font:{size:10}}, grid:{display:false} }
+      },
+      maintainAspectRatio: false, animation:{duration:400}
+    }
   });
 }
 
@@ -1381,6 +1578,42 @@ function renderUpcomingCatalysts() {
   `).join('');
 }
 
+// ── Biggest Movers (held picks, ranked by |Return Since Initiation|) ──
+const BIGGEST_MOVERS_LIMIT = 5;
+function getBiggestMovers() {
+  return heldWithReturn(STOCKS)
+    .sort((a, b) => Math.abs(b.returnPctNum) - Math.abs(a.returnPctNum))
+    .slice(0, BIGGEST_MOVERS_LIMIT);
+}
+
+function renderBiggestMovers() {
+  const list = document.getElementById('moversList');
+  const items = getBiggestMovers();
+  document.getElementById('moversCount').textContent = items.length ? `top ${items.length}` : '';
+
+  if (!items.length) {
+    list.innerHTML = '<div class="activity-empty">No held picks with both an initiation and a live price yet.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(r => {
+    const cls = r.returnPctNum >= 0 ? 'pos' : 'neg';
+    const sign = r.returnPctNum >= 0 ? '+' : '';
+    return `
+    <div class="activity-item pa-mover-${cls}">
+      <div class="ai-top">
+        <span class="ai-ticker">${r.ticker}</span>
+        <span class="return-badge ${cls}">${sign}${r.returnPctNum.toFixed(1)}%</span>
+      </div>
+      <div class="ai-change">
+        <span class="ai-new">${badge(r.direction)}</span>
+      </div>
+      <div class="ai-meta">${r.analyst} &nbsp;·&nbsp; ${r.company}</div>
+    </div>
+  `;
+  }).join('');
+}
+
 // ── Table ─────────────────────────────────────────────────────
 const TABLE_COLSPAN = 16;
 
@@ -1402,7 +1635,7 @@ function buildRow(r) {
     <td class="sector-cell" title="${r.sector||''}">${r.sector||'<span class="badge-none">—</span>'}</td>
     <td>${badge(r.direction)}</td>
     <td>${badge(r.conviction)}</td>
-    <td class="target-price">${formatTargetPrice(r.target) || '<span class="badge-none">—</span>'}</td>
+    <td class="target-price">${formatTargetPrice(r.target) || '<span class="badge-none">—</span>'}${targetProgressHtml(r)}</td>
     <td>${badge(r.status)}</td>
     <td class="catalyst">${r.catalyst ? r.catalyst + countdownBadge(r.catalyst) : '<span class="badge-none">—</span>'}</td>
     <td class="thesis"><div class="thesis-inner">${thesisHtml}</div></td>
@@ -1424,6 +1657,7 @@ function buildCard(r) {
     ${r.catalyst?`<div class="mc-catalyst">&#9889; ${r.catalyst}</div>`:''}
     ${r.thesis?`<div class="mc-meta" style="margin-top:4px">${r.thesis}</div>`:''}
     ${r.dateAdded?`<div class="mc-meta" style="margin-top:4px">Initial date: ${r.dateAdded}</div>`:''}
+    ${targetProgressHtml(r) ? `<div style="margin-top:6px">${targetProgressHtml(r)}</div>` : ''}
     ${r.link?`<div style="margin-top:8px"><a class="doc-btn" href="${r.link}" target="_blank" rel="noopener">&#128196; View Research</a></div>`:''}
   `;
   return card;
@@ -1598,6 +1832,7 @@ renderActivity();
 renderPriorityAlerts();
 renderNeedsAttentionAlerts();
 renderUpcomingCatalysts();
+renderBiggestMovers();
 render();
 
 ['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fHeld','fCatalyst'].forEach(id =>
