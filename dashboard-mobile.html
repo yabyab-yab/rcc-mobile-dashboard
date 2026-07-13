@@ -663,7 +663,8 @@ const STOCKS = [
   { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-06-03", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"", held:"No" },
   { ticker:"MET", company:"MetLife", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"1", target:"", status:"Idea Pipeline", catalyst:"MET earns August 6", thesis:"Initial review for office exposure; also private credit", date:"", link:"", memo:"", held:"Yes" },
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes" },
-  { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes" }
+  { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes" },
+  { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"2026-07-13", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No" }
 ];
 
 
@@ -673,7 +674,18 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-13 08:30", user:"Kamaljit Gill", ticker:"GIS", field:"Thesis / Notes", oldVal:"H2 margin degradation", newVal:"Incremental H2 margin degradation for an already unliked name" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Thesis / Notes", oldVal:"H2 Margin degradation", newVal:"H2 margin degradation" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Thesis / Notes", oldVal:"Margin degradation", newVal:"H2 Margin degradation" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Thesis / Notes", oldVal:"", newVal:"Margin degradation" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Conviction", oldVal:"", newVal:"2" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Direction", oldVal:"", newVal:"Short" },
+  { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Sector", oldVal:"", newVal:"Consumer Staples" },
+  { ts:"2026-07-13 08:28", user:"Kamaljit Gill", ticker:"GIS", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
+  { ts:"2026-07-13 08:28", user:"Kamaljit Gill", ticker:"GIS", field:"Ticker", oldVal:"", newVal:"GIS" },
   { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"Q3 Earnings" },
   { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"" },
   { ts:"2026-07-10 14:42", user:"Khaled Beydoun", ticker:"EQPT", field:"Assignments", oldVal:"", newVal:"PM-Assigned" },
@@ -813,18 +825,9 @@ const AUDIT = [
   { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
   { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Company Name", oldVal:"", newVal:"Turning Point Brands" },
   { ts:"2026-07-07 21:31", user:"Kamaljit Gill", ticker:"TPB", field:"Ticker", oldVal:"", newVal:"TPB" },
-  { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue growth acceleration - organic + AI", newVal:"Revenue growth acceleration - organic + new AI product" },
-  { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue acceleration -", newVal:"Revenue growth acceleration - organic + AI" },
-  { ts:"2026-07-07 21:21", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Self help + shareholder friendly capital deployment", newVal:"Revenue acceleration -" },
-  { ts:"2026-07-07 21:21", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"", newVal:"Self help + shareholder friendly capital deployment" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Conviction", oldVal:"", newVal:"Developing" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Direction", oldVal:"", newVal:"Long" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Sector", oldVal:"", newVal:"Information Technology" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Company Name", oldVal:"", newVal:"Ncino" },
-  { ts:"2026-07-07 21:20", user:"Kamaljit Gill", ticker:"NCNO", field:"Ticker", oldVal:"", newVal:"NCNO" }
+  { ts:"2026-07-07 21:22", user:"Kamaljit Gill", ticker:"NCNO", field:"Thesis / Notes", oldVal:"Revenue growth acceleration - organic + AI", newVal:"Revenue growth acceleration - organic + new AI product" }
 ];
+
 
 
 
