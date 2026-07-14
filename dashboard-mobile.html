@@ -696,7 +696,7 @@ const STOCKS = [
   { ticker:"T", company:"AT&T", assignment:"PM-Assigned", dateAdded:"2026-05-15", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15 USD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"Yes", returnPct:"11.4", initPrice:"24.03", livePrice:"21.29" },
   { ticker:"RCI", company:"Rogers Communications", assignment:"PM-Assigned", dateAdded:"2026-05-16", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"25 CAD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"No", returnPct:"7.3", initPrice:"35.53", livePrice:"32.92" },
   { ticker:"SMG", company:"Swiss Marketplace Group", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Short", conviction:"5", target:"20", status:"Active", catalyst:"H1 Earnings August 25", thesis:"Growth profile doesn’t substantiate valuation", date:"2026-07-09", link:"", memo:"", held:"Yes", returnPct:"27.6", initPrice:"36.80", livePrice:"26.65" },
-  { ticker:"NCNO", company:"Ncino", assignment:"PM-Assigned", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Information Technology", direction:"Long", conviction:"4", target:"25", status:"Active", catalyst:"", thesis:"Revenue growth acceleration - organic + new AI product", date:"2026-07-14", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/nCino Investment Case (July 2026).docx?d=w8d793b9c2b7a43d6a7ba4e6f2d2d4ee2&csf=1&web=1&e=kvjYTc", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"NCNO", company:"Ncino", assignment:"PM-Assigned", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Information Technology", direction:"Long", conviction:"4", target:"25", status:"Active", catalyst:"Q3 Earnings", thesis:"Revenue growth acceleration - organic + new AI product", date:"2026-07-14", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/nCino Investment Case (July 2026).docx?d=w8d793b9c2b7a43d6a7ba4e6f2d2d4ee2&csf=1&web=1&e=kvjYTc", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"DSV DC", company:"DSV A/S", assignment:"Self-Sourced", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"5", target:"3000 DKK", status:"Active", catalyst:"Beat-and-raise cadence resumes Q2/Q3, buyback H2", thesis:"Synergies, AI winner, buyback potential 40% of mkt cap. 15 '30 EBIT +35% above cons", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/DSV Investment Case July 2024.docx?d=wf1dcd48b9bf74050bb4e2c9fe45d8d2b&csf=1&web=1&e=vPD3p6", memo:"", held:"No", returnPct:"5.2", initPrice:"1600.00", livePrice:"1682.50" },
   { ticker:"ENS", company:"EnerSys", assignment:"PM-Assigned", dateAdded:"2026-04-23", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"4", target:"400 USD", status:"Active", catalyst:"Q2/Q3 earnings, hyperscaler announcement H2'26 of early '27", thesis:"5% mkt shr of Lithium batteries for DC, 20x $20 of EPS", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EnerSys Investment Case May 2026.docx?d=w08e7d915d6b343729effcf12caf7b092&csf=1&web=1&e=3zbxaf", memo:"", held:"Yes", returnPct:"-3.2", initPrice:"207.80", livePrice:"201.23" },
   { ticker:"SPOT", company:"Spotify Technology", assignment:"PM-Assigned", dateAdded:"2026-06-30", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"4", target:"1000 USD", status:"Active", catalyst:"EBIT upside Q2/Q3", thesis:"Solid cash compounder, not AI-loser, 40% gross margins vs cons 35%, 30x EBITDA", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Spotify update June 2026.docx?d=wadb2471b24e9458ebec8bb90cb25c70e&csf=1&web=1&e=JNZKxe", memo:"", held:"Yes", returnPct:"4.8", initPrice:"459.13", livePrice:"481.06" },
@@ -726,7 +726,10 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-14 18:33", user:"Kamaljit Gill", ticker:"NCNO", field:"Next Catalyst", oldVal:"", newVal:"Q3 Earnings" },
+  { ts:"2026-07-14 18:33", user:"Kamaljit Gill", ticker:"NCNO", field:"Next Catalyst", oldVal:"", newVal:"Q3 Earnings" },
   { ts:"2026-07-14 18:33", user:"Kamaljit Gill", ticker:"NCNO", field:"Status", oldVal:"Idea Pipeline", newVal:"Active" },
   { ts:"2026-07-14 18:33", user:"Kamaljit Gill", ticker:"NCNO", field:"Target Price", oldVal:"", newVal:"25" },
   { ts:"2026-07-14 18:33", user:"Kamaljit Gill", ticker:"NCNO", field:"Research Link", oldVal:"", newVal:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared%20Documents/Youssef%27s%20Projects/Analyst%20Research/nCino%20Investment%20Case%20(July%202026).docx?d=w8d793b9c2b7a43d6a7ba4e6f2d2d4ee2&csf=1&web=1&e=kvjYTc" },
@@ -874,10 +877,9 @@ const AUDIT = [
   { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Status", oldVal:"", newVal:"Active" },
   { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Conviction", oldVal:"", newVal:"High" },
   { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Direction", oldVal:"", newVal:"Short" },
-  { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Sector", oldVal:"", newVal:"Communication Services" },
-  { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
-  { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Company Name", oldVal:"", newVal:"Rogers Communications" }
+  { ts:"2026-07-07 21:34", user:"Kamaljit Gill", ticker:"RCI", field:"Sector", oldVal:"", newVal:"Communication Services" }
 ];
+
 
 
 
