@@ -283,10 +283,11 @@
   .countdown-cool  { background:rgba(0,123,127,.12); color:var(--teal); border:1px solid rgba(0,123,127,.25); }
 
   /* RETURN SINCE INITIATION - shown as an inline badge next to the ticker
-     (held positions only, direction-adjusted so a Short with a falling
-     price still reads as a gain), not its own table column, so it never
-     forces horizontal scroll on the Stock Picks table. Same "cue without
-     adding table width" approach as the held-row accent above. */
+     (any pick with pricing data, held or not; direction-adjusted so a
+     Short with a falling price still reads as a gain), not its own table
+     column, so it never forces horizontal scroll on the Stock Picks
+     table. Same "cue without adding table width" approach as the
+     held-row accent above. */
   .return-badge { display:inline-block; margin-left:6px; padding:1px 7px; border-radius:20px; font-size:10px; font-weight:800; white-space:nowrap; vertical-align:1px; cursor:default; }
   .return-badge.pos { background:rgba(34,197,94,.15);  color:var(--long);  border:1px solid rgba(34,197,94,.3); }
   .return-badge.neg { background:rgba(239,68,68,.15);  color:var(--short); border:1px solid rgba(239,68,68,.3); }
@@ -578,7 +579,7 @@
       <div class="table-header">
         <span class="title">Stock Picks<span class="legend-tip" title="The % badge next to a ticker is the return since initiation, direction-adjusted — for Shorts, a falling price counts as a gain. Green/positive always means the thesis is working; red/negative always means it isn't, regardless of Long or Short.">&#9432;</span></span>
         <div style="display:flex;align-items:center;gap:10px">
-          <button class="sort-return-btn" id="sortReturnBtn" onclick="sortBy('returnPct')" title="Sort by Return Since Initiation (direction-adjusted; held picks with pricing data first)">Sort by Return <span class="sort-icon" id="si-returnPct">▲</span></button>
+          <button class="sort-return-btn" id="sortReturnBtn" onclick="sortBy('returnPct')" title="Sort by Return Since Initiation (direction-adjusted; picks with pricing data first, held or not)">Sort by Return <span class="sort-icon" id="si-returnPct">▲</span></button>
           <input class="search-box" id="searchBox" placeholder="&#128269; Search ticker or company..." oninput="render()"/>
         </div>
       </div>
@@ -693,19 +694,19 @@ const STOCKS = [
   { ticker:"RACE", company:"Ferrari NV", assignment:"PM-Assigned", dateAdded:"2026-06-30", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"5", target:"", status:"Active", catalyst:"Q2 Earnings July 30", thesis:"Low valuation v. recent history despite potential tailwind from growth in HNWIs", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Race Investment Case June 2026.docx?d=w342cc5ab68e240a09ce08cb064739a01&csf=1&web=1&e=EEaSv4", memo:"", held:"Yes", returnPct:"0.2", initPrice:"372.29", livePrice:"372.98" },
   { ticker:"CMCSA", company:"Comcast", assignment:"PM-Assigned", dateAdded:"2026-05-15", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15 USD", status:"Active", catalyst:"Q2 Earnings July 23", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"Yes", returnPct:"3.2", initPrice:"24.76", livePrice:"23.97" },
   { ticker:"T", company:"AT&T", assignment:"PM-Assigned", dateAdded:"2026-05-15", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"15 USD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"Yes", returnPct:"10.3", initPrice:"24.03", livePrice:"21.56" },
-  { ticker:"RCI", company:"Rogers Communications", assignment:"PM-Assigned", dateAdded:"2026-05-16", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"25 CAD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"RCI", company:"Rogers Communications", assignment:"PM-Assigned", dateAdded:"2026-05-16", analyst:"Kamaljit Gill", sector:"Communication Services", direction:"Short", conviction:"5", target:"25 CAD", status:"Active", catalyst:"Q2 Earnings July 22", thesis:"Starlink broaband disruption thesis", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Starlink_vSensitivity Investment Case (June 2026).pptx?d=wffa9b668d6b3477d8c639b6b6e4aaec1&csf=1&web=1&e=9AHd1z", memo:"", held:"No", returnPct:"6.1", initPrice:"35.53", livePrice:"33.38" },
   { ticker:"SMG", company:"Swiss Marketplace Group", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Short", conviction:"5", target:"20", status:"Active", catalyst:"H1 Earnings August 25", thesis:"Growth profile doesn’t substantiate valuation", date:"2026-07-09", link:"", memo:"", held:"Yes", returnPct:"27.6", initPrice:"36.80", livePrice:"26.65" },
-  { ticker:"NCNO", company:"Ncino", assignment:"PM-Assigned", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Information Technology", direction:"Long", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Revenue growth acceleration - organic + new AI product", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"DSV DC", company:"DSV A/S", assignment:"Self-Sourced", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"5", target:"3000 DKK", status:"Active", catalyst:"Beat-and-raise cadence resumes Q2/Q3, buyback H2", thesis:"Synergies, AI winner, buyback potential 40% of mkt cap. 15 '30 EBIT +35% above cons", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/DSV Investment Case July 2024.docx?d=wf1dcd48b9bf74050bb4e2c9fe45d8d2b&csf=1&web=1&e=vPD3p6", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"NCNO", company:"Ncino", assignment:"PM-Assigned", dateAdded:"2026-07-07", analyst:"Kamaljit Gill", sector:"Information Technology", direction:"Long", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Revenue growth acceleration - organic + new AI product", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"-3.7", initPrice:"18.06", livePrice:"17.40" },
+  { ticker:"DSV DC", company:"DSV A/S", assignment:"Self-Sourced", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"5", target:"3000 DKK", status:"Active", catalyst:"Beat-and-raise cadence resumes Q2/Q3, buyback H2", thesis:"Synergies, AI winner, buyback potential 40% of mkt cap. 15 '30 EBIT +35% above cons", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/DSV Investment Case July 2024.docx?d=wf1dcd48b9bf74050bb4e2c9fe45d8d2b&csf=1&web=1&e=vPD3p6", memo:"", held:"No", returnPct:"5.2", initPrice:"1600.00", livePrice:"1682.50" },
   { ticker:"ENS", company:"EnerSys", assignment:"PM-Assigned", dateAdded:"2026-04-23", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"4", target:"400 USD", status:"Active", catalyst:"Q2/Q3 earnings, hyperscaler announcement H2'26 of early '27", thesis:"5% mkt shr of Lithium batteries for DC, 20x $20 of EPS", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EnerSys Investment Case May 2026.docx?d=w08e7d915d6b343729effcf12caf7b092&csf=1&web=1&e=3zbxaf", memo:"", held:"Yes", returnPct:"-3.2", initPrice:"207.80", livePrice:"201.09" },
   { ticker:"SPOT", company:"Spotify Technology", assignment:"PM-Assigned", dateAdded:"2026-06-30", analyst:"Tehmur Jabbar", sector:"Technology", direction:"Long", conviction:"4", target:"1000 USD", status:"Active", catalyst:"EBIT upside Q2/Q3", thesis:"Solid cash compounder, not AI-loser, 40% gross margins vs cons 35%, 30x EBITDA", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Spotify update June 2026.docx?d=wadb2471b24e9458ebec8bb90cb25c70e&csf=1&web=1&e=JNZKxe", memo:"", held:"Yes", returnPct:"4.5", initPrice:"459.13", livePrice:"479.84" },
   { ticker:"MU", company:"Micron Technology", assignment:"PM-Assigned", dateAdded:"2026-06-29", analyst:"Tehmur Jabbar", sector:"Communication Services", direction:"Long", conviction:"5", target:"3000 USD", status:"Active", catalyst:"More details on SCA agreements, DRAM spot upside in H2", thesis:"HBM no longer cyclical, LITE multiple (40x) on $75 of EPS = $3000", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Micron Investment Case March 2024.docx?d=w949b619d0c7844be8f9d6179c02b5b21&csf=1&web=1&e=n2uDFu", memo:"", held:"Yes", returnPct:"-18.3", initPrice:"1145.28", livePrice:"936.18" },
   { ticker:"ONTO", company:"Onto Innovation", assignment:"PM-Assigned", dateAdded:"2026-06-17", analyst:"Tehmur Jabbar", sector:"Communication Services", direction:"Long", conviction:"4", target:"400 USD", status:"Active", catalyst:"Watch KLA share at TSMC during Q2, Hynix ramp in H2", thesis:"Small but important WFE vendor, shouldn’t be at discount to KLAC/CAMT", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/ONTO investment case Jun 2026.docx?d=w7b70872d06ee4c2fa8e2959daff22eb0&csf=1&web=1&e=AXaeu7", memo:"", held:"Yes", returnPct:"-4.6", initPrice:"318.92", livePrice:"304.21" },
   { ticker:"KNX", company:"Knight-Swift Transportation", assignment:"Self-Sourced", dateAdded:"2026-05-14", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"4", target:"100 USD", status:"Active", catalyst:"Q2 earnings, post summer jump in TL spot rates (september)", thesis:"Early innings of trucking upcycle, severe driver shortage, 15x $6.50 of EPS", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Knight Swift Investment Case May 2026.docx?d=wbeae420c4c9f4acb9af39344515d06db&csf=1&web=1&e=fjy0sQ", memo:"", held:"Yes", returnPct:"9.3", initPrice:"68.03", livePrice:"74.33" },
   { ticker:"BBY", company:"BestBuy", assignment:"Self-Sourced", dateAdded:"2026-04-12", analyst:"Tehmur Jabbar", sector:"Consumer Discretionary", direction:"Short", conviction:"4", target:"43 USD", status:"Active", catalyst:"H2 memory shortfall, watch for pull forward", thesis:"Memory shortage=> -1% SSS vs cons +1 current year. 8x $5.30 EPS vs cons 6.60 =43", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Best Buy Mar 2026.docx?d=wa8505df0865f4bcdb86a3326a46388c2&csf=1&web=1&e=50MgeE", memo:"", held:"Yes", returnPct:"-34.2", initPrice:"60.85", livePrice:"81.65" },
-  { ticker:"KNIN SW", company:"Kuehne & Nagel", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Short", conviction:"2", target:"160 CHF", status:"Active", catalyst:"DSV hedge", thesis:"19x '27 EV/EBIT vs DSV at 16x with synergy story and capital return. 16x cons = 160CHF", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"PCAR", company:"PACCAR Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"3", target:"", status:"Idea Pipeline", catalyst:"EPA will release new engine rules, July '26", thesis:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-06-03", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"KNIN SW", company:"Kuehne & Nagel", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Short", conviction:"2", target:"160 CHF", status:"Active", catalyst:"DSV hedge", thesis:"19x '27 EV/EBIT vs DSV at 16x with synergy story and capital return. 16x cons = 160CHF", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"-20.6", initPrice:"174.00", livePrice:"209.90" },
+  { ticker:"PCAR", company:"PACCAR Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"3", target:"", status:"Idea Pipeline", catalyst:"EPA will release new engine rules, July '26", thesis:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"1.4", initPrice:"122.50", livePrice:"124.26" },
+  { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-06-03", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"-19.5", initPrice:"25.07", livePrice:"29.96" },
   { ticker:"MET", company:"MetLife", assignment:"PM-Assigned", dateAdded:"2026-07-09", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"1", target:"", status:"Idea Pipeline", catalyst:"MET earns August 6", thesis:"Initial review for office exposure; also private credit", date:"", link:"", memo:"", held:"Yes", returnPct:"-2.1", initPrice:"91.15", livePrice:"93.03" },
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes", returnPct:"-64.4", initPrice:"4.47", livePrice:"7.35" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10", status:"Active", catalyst:"Earning August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"", held:"Yes", returnPct:"12.7", initPrice:"19.28", livePrice:"16.83" },
@@ -713,16 +714,6 @@ const STOCKS = [
   { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"TBBK", company:"Bancorp, Inc", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"4", target:"", status:"Active", catalyst:"Earnings July 24, 2026", thesis:"CRE credit exposure impairment to book value; weakening earnings quality", date:"", link:"", memo:"", held:"Yes", returnPct:"", initPrice:"", livePrice:"" }
 ];
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -887,16 +878,6 @@ const AUDIT = [
 
 
 
-
-
-
-
-
-
-
-
-
-
 // ── Thesis expand/collapse ──────────────────────────────────────
 let expandedTickers = new Set();
 function toggleThesis(ticker) {
@@ -966,11 +947,14 @@ function countdownBadge(catalystStr) {
 
 // Return Since Initiation - initiation-day EOD close vs. latest published
 // price, direction-adjusted so a Short position that's fallen in price
-// still shows as a gain. Only rendered for currently-held picks with both
-// prices available (r.returnPct is left '' by the VBA export otherwise -
-// see DashboardUpdater.bas's BuildLivePriceMap/BuildInitiationPriceMap).
+// still shows as a gain. Rendered for ANY pick with both prices available,
+// held or not (r.returnPct is left '' by the VBA export otherwise) - see
+// DashboardUpdater.bas's BuildLivePriceMap/BuildUnheldPriceMap/
+// BuildInitiationPriceMap. Coverage was held-only until 2026-07-14, when
+// the "Unheld Positions Pricing" sheet started giving us live prices for
+// names we don't hold too.
 function returnBadge(r) {
-  if (r.held !== 'Yes' || r.returnPct === '' || r.returnPct === undefined) return '';
+  if (r.returnPct === '' || r.returnPct === undefined) return '';
   const v = parseFloat(r.returnPct);
   if (isNaN(v)) return '';
   const cls = v >= 0 ? 'pos' : 'neg';
