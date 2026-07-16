@@ -711,7 +711,7 @@ const STOCKS = [
   { ticker:"HPK", company:"Highpeak Energy Inc", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Khaled Beydoun", sector:"Energy", direction:"Short", conviction:"4", target:"5 USD", status:"Active", catalyst:"Earnings early August", thesis:"Lowest quality E&P producers. Levered with no FCF and bad rock.", date:"2026-07-09", link:"", memo:"", held:"Yes", returnPct:"-63.1", initPrice:"4.47", livePrice:"7.29" },
   { ticker:"EQPT", company:"EquipmentShare Inc.", assignment:"PM-Assigned", dateAdded:"2026-05-05", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"4", target:"10 USD", status:"Active", catalyst:"URI earns July 23.  EQPT earns August 13", thesis:"Probable fraud: related party transactions, dubious off balance sheet financing", date:"2026-07-10", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/EquipmentShare Forensic Research Group Report.docx?d=w61bf0161c2f44bc0a838f114cda20867&csf=1&web=1&e=6gDESR", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/One Page Investment Memo EQPT v.1.0.docx?d=wa229434242994bd792300779e5588377&csf=1&web=1&e=oBS3QK", held:"Yes", returnPct:"8.5", initPrice:"19.28", livePrice:"17.64" },
   { ticker:"GIS", company:"General Mills", assignment:"", dateAdded:"", analyst:"Kamaljit Gill", sector:"Consumer Staples", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Incremental H2 margin degradation for an already unliked name", date:"2026-07-13", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"", conviction:"", target:"", status:"Idea Pipeline", catalyst:"", thesis:"", date:"2026-07-16", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Union Pacific Investment Case July 2026.docx?d=wa8eda3bde1944c84a435fded4f5474fc&csf=1&web=1&e=uxfDGW", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/UNP.docx?d=w59caa045cd154b909e51e6d0c18e1c80&csf=1&web=1&e=TEYbZH", held:"No", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"3", target:"380", status:"Idea Pipeline", catalyst:"", thesis:"$4bn of synergy potential vs guide/cons $3bn. $19 EPS base case on 20x = 380", date:"2026-07-16", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Union Pacific Investment Case July 2026.docx?d=wa8eda3bde1944c84a435fded4f5474fc&csf=1&web=1&e=uxfDGW", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/UNP.docx?d=w59caa045cd154b909e51e6d0c18e1c80&csf=1&web=1&e=TEYbZH", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"TBBK", company:"Bancorp, Inc", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"4", target:"45 USD", status:"Active", catalyst:"Earnings July 24, 2026", thesis:"CRE credit exposure impairment to book value; weakening earnings quality", date:"", link:"", memo:"", held:"Yes", returnPct:"", initPrice:"", livePrice:"" }
 ];
 
@@ -747,7 +747,12 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-16 13:58", user:"Tehmur Jabbar", ticker:"UNP", field:"Thesis / Notes", oldVal:"", newVal:"$4bn of synergy potential vs guide/cons $3bn. $19 EPS base case on 20x = 380" },
+  { ts:"2026-07-16 13:57", user:"Tehmur Jabbar", ticker:"UNP", field:"Direction", oldVal:"", newVal:"Long" },
+  { ts:"2026-07-16 13:57", user:"Tehmur Jabbar", ticker:"UNP", field:"Conviction", oldVal:"", newVal:"3" },
+  { ts:"2026-07-16 13:57", user:"Tehmur Jabbar", ticker:"UNP", field:"Target Price", oldVal:"", newVal:"380" },
   { ts:"2026-07-16 13:56", user:"Tehmur Jabbar", ticker:"UNP", field:"Memo Link", oldVal:"Analyst Research", newVal:"UNP.docx" },
   { ts:"2026-07-16 13:56", user:"Tehmur Jabbar", ticker:"UNP", field:"Research Link", oldVal:"", newVal:"Union Pacific Investment Case July 2026.docx" },
   { ts:"2026-07-16 13:55", user:"Tehmur Jabbar", ticker:"UNP", field:"Memo Link", oldVal:"", newVal:"Analyst Research" },
@@ -893,12 +898,9 @@ const AUDIT = [
   { ts:"2026-07-08 08:34", user:"Tehmur Jabbar", ticker:"PCAR", field:"Conviction", oldVal:"", newVal:"Developing" },
   { ts:"2026-07-08 08:34", user:"Tehmur Jabbar", ticker:"PCAR", field:"Direction", oldVal:"", newVal:"Long" },
   { ts:"2026-07-08 08:34", user:"Tehmur Jabbar", ticker:"PCAR", field:"Sector", oldVal:"", newVal:"Industrials" },
-  { ts:"2026-07-08 08:33", user:"Tehmur Jabbar", ticker:"PCAR", field:"Analyst", oldVal:"", newVal:"Tehmur Jabbar" },
-  { ts:"2026-07-08 08:33", user:"Tehmur Jabbar", ticker:"PCAR", field:"Company Name", oldVal:"", newVal:"PACCAR Inc" },
-  { ts:"2026-07-08 08:33", user:"Tehmur Jabbar", ticker:"PCAR", field:"Ticker", oldVal:"", newVal:"PCAR" },
-  { ts:"2026-07-07 21:37", user:"Kamaljit Gill", ticker:"SMG", field:"Next Catalyst", oldVal:"H1 Earnings August 25, 2026", newVal:"H1 Earnings August 25" },
-  { ts:"2026-07-07 21:37", user:"Kamaljit Gill", ticker:"SMG", field:"Next Catalyst", oldVal:"", newVal:"H1 Earnings August 25, 2026" }
+  { ts:"2026-07-08 08:33", user:"Tehmur Jabbar", ticker:"PCAR", field:"Analyst", oldVal:"", newVal:"Tehmur Jabbar" }
 ];
+
 
 
 
