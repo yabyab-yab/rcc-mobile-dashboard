@@ -721,7 +721,6 @@ const STOCKS = [
 
 
 
-
 const AUDIT = [
   { ts:"2026-07-16 14:01", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Memo Link", oldVal:"", newVal:"DSV.docx" },
   { ts:"2026-07-16 14:01", user:"Tehmur Jabbar", ticker:"SPOT", field:"Memo Link", oldVal:"", newVal:"SPOT.docx" },
@@ -874,7 +873,6 @@ const AUDIT = [
   { ts:"2026-07-08 15:53", user:"Tehmur Jabbar", ticker:"BBY", field:"Conviction", oldVal:"3", newVal:"4" },
   { ts:"2026-07-08 15:47", user:"Tehmur Jabbar", ticker:"KNIN SW", field:"Conviction", oldVal:"Neutral", newVal:"2" }
 ];
-
 
 
 
@@ -1665,4 +1663,9 @@ renderNeedsAttentionAlerts();
 renderUpcomingCatalysts();
 render();
 
-['fAssignment'
+['fAssignment','fAnalyst','fSector','fDirection','fConviction','fStatus','fHeld','fCatalyst'].forEach(id => {
+  document.getElementById(id).addEventListener('change', render);
+});
+</script>
+</body>
+</html>
