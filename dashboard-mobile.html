@@ -712,7 +712,7 @@ const STOCKS = [
   { ticker:"BBY", company:"BestBuy", assignment:"Self-Sourced", dateAdded:"2026-04-12", analyst:"Tehmur Jabbar", sector:"Consumer Discretionary", direction:"Short", conviction:"4", target:"43 USD", status:"Active", catalyst:"H2 memory shortfall, watch for pull forward", thesis:"Memory shortage=> -1% SSS vs cons +1 current year. 8x $5.30 EPS vs cons 6.60 =43", date:"2026-07-16", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Best Buy Mar 2026.docx?d=wa8505df0865f4bcdb86a3326a46388c2&csf=1&web=1&e=50MgeE", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/BBY.docx?d=w61018b0625de44839b49b90407d04073&csf=1&web=1&e=omsJbI", held:"Yes", returnPct:"-40.3", initPrice:"60.85", livePrice:"85.37" },
   { ticker:"KNIN SW", company:"Kuehne & Nagel", assignment:"PM-Assigned", dateAdded:"2026-01-01", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Short", conviction:"2", target:"160 CHF", status:"Active", catalyst:"DSV hedge", thesis:"19x '27 EV/EBIT vs DSV at 16x with synergy story and capital return. 16x cons = 160CHF", date:"2026-07-16", link:"", memo:"", held:"No", returnPct:"-20.8", initPrice:"174.00", livePrice:"210.20" },
   { ticker:"PCAR", company:"PACCAR Inc", assignment:"Self-Sourced", dateAdded:"2026-07-08", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"3", target:"", status:"Idea Pipeline", catalyst:"EPA will release new engine rules, July '26", thesis:"Cons has 160k deliveries in each '26 and '27, PCAR can do 200k. $8.55 in EPS vs cons $6.75 =30% upside", date:"2026-07-16", link:"", memo:"", held:"No", returnPct:"0.5", initPrice:"122.50", livePrice:"123.15" },
-  { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-06-03", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"-21.2", initPrice:"25.07", livePrice:"30.39" },
+  { ticker:"TOST", company:"Toast Inc", assignment:"Self-Sourced", dateAdded:"2026-06-03", analyst:"Tehmur Jabbar", sector:"Information Technology", direction:"Short", conviction:"3", target:"", status:"Active", catalyst:"", thesis:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28.", date:"2026-07-17", link:"", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/TOST.docx?d=wf9ea2899cf144ca7a7dd2334f9b322f9&csf=1&web=1&e=UArQHz", held:"No", returnPct:"-21.2", initPrice:"25.07", livePrice:"30.39" },
   { ticker:"UNP", company:"Union Pacific", assignment:"PM-Assigned", dateAdded:"2026-07-13", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Long", conviction:"4", target:"380", status:"Idea Pipeline", catalyst:"", thesis:"$4bn of synergy potential vs guide/cons $3bn. $19 EPS base case on 20x = 380", date:"2026-07-16", link:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/Union Pacific Investment Case July 2026.docx?d=wa8eda3bde1944c84a435fded4f5474fc&csf=1&web=1&e=uxfDGW", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/UNP.docx?d=w59caa045cd154b909e51e6d0c18e1c80&csf=1&web=1&e=TEYbZH", held:"No", returnPct:"-0.3", initPrice:"289.13", livePrice:"288.36" }
 ];
 
@@ -728,7 +728,10 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-07-17 11:50", user:"Tehmur Jabbar", ticker:"TOST", field:"Memo Link", oldVal:"", newVal:"TOST.docx" },
+  { ts:"2026-07-17 11:50", user:"Tehmur Jabbar", ticker:"TOST", field:"Memo Link", oldVal:"", newVal:"Analyst Research" },
   { ts:"2026-07-17 08:19", user:"Kamaljit Gill", ticker:"ATZ", field:"Target Price", oldVal:"200 USD", newVal:"200 CAD" },
   { ts:"2026-07-17 08:19", user:"Kamaljit Gill", ticker:"CMCSA", field:"Target Price", oldVal:"15 USD", newVal:"17 USD" },
   { ts:"2026-07-17 08:19", user:"Kamaljit Gill", ticker:"T", field:"Target Price", oldVal:"18", newVal:"18 USD" },
@@ -876,10 +879,9 @@ const AUDIT = [
   { ts:"2026-07-08 16:15", user:"Kamaljit Gill", ticker:"CMCSA", field:"Conviction", oldVal:"High", newVal:"5" },
   { ts:"2026-07-08 16:15", user:"Kamaljit Gill", ticker:"T", field:"Conviction", oldVal:"High", newVal:"5" },
   { ts:"2026-07-08 16:15", user:"Kamaljit Gill", ticker:"RCI", field:"Conviction", oldVal:"High", newVal:"5" },
-  { ts:"2026-07-08 16:15", user:"Kamaljit Gill", ticker:"SMG", field:"Conviction", oldVal:"High", newVal:"5" },
-  { ts:"2026-07-08 15:57", user:"Tehmur Jabbar", ticker:"TOST", field:"Thesis / Notes", oldVal:"", newVal:"-10% lfl is reasonable expectation for GLP1 users, cons only has +1% for TOST wholeco. Implies EBIT -30% vs cons in '28." },
-  { ts:"2026-07-08 15:55", user:"Tehmur Jabbar", ticker:"TOST", field:"Status", oldVal:"", newVal:"Idea Pipeline" }
+  { ts:"2026-07-08 16:15", user:"Kamaljit Gill", ticker:"SMG", field:"Conviction", oldVal:"High", newVal:"5" }
 ];
+
 
 
 
