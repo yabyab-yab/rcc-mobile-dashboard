@@ -718,7 +718,8 @@ const STOCKS = [
   { ticker:"ODFL", company:"Old Dominion", assignment:"Self-Sourced", dateAdded:"2026-08-05", analyst:"Tehmur Jabbar", sector:"Industrials", direction:"Short", conviction:"4", target:"150", status:"Idea Pipeline", catalyst:"Q3 mid Q update, Saia/XPO share gains", thesis:"KNX hedge, too expensive, no vol growth = -20% to cons EBIT with 75% OR. $5 EPS on 30x", date:"2026-08-05", link:"", memo:"", held:"Yes", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"KNF", company:"Knife River", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Industrials", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Re-rate thesis has failed; management underdelivering", date:"", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"NCLH", company:"Norwegian Cruise Line Holdings", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Leisure", direction:"Short", conviction:"2", target:"", status:"Idea Pipeline", catalyst:"", thesis:"Turnaround story may disappoint", date:"", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"COF", company:"Capital One Financial", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Long", conviction:"3", target:"250", status:"Active", catalyst:"Barclays Fins Servs Conference September 14", thesis:"Benefits from DFS acquisition start to drive financial results", date:"", link:"", memo:"", held:"Yes", returnPct:"", initPrice:"", livePrice:"" }
+  { ticker:"COF", company:"Capital One Financial", assignment:"", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Long", conviction:"3", target:"250", status:"Active", catalyst:"Barclays Fins Servs Conference September 14", thesis:"Benefits from DFS acquisition start to drive financial results", date:"", link:"", memo:"", held:"Yes", returnPct:"", initPrice:"", livePrice:"" },
+  { ticker:"SGI", company:"Somnigroup", assignment:"", dateAdded:"2026-08-21", analyst:"Kamaljit Gill", sector:"Consumer Discretionary", direction:"Long", conviction:"2", target:"", status:"", catalyst:"", thesis:"Market share leader that has acquired", date:"2026-08-21", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" }
 ];
 
 
@@ -783,7 +784,16 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-08-21 09:00", user:"Kamaljit Gill", ticker:"SGI", field:"Sector", oldVal:"", newVal:"Consumer Discretionary" },
+  { ts:"2026-08-21 09:00", user:"Kamaljit Gill", ticker:"SGI", field:"Thesis / Notes", oldVal:"Market share leader that has acquire", newVal:"Market share leader that has acquired" },
+  { ts:"2026-08-21 09:00", user:"Kamaljit Gill", ticker:"SGI", field:"Thesis / Notes", oldVal:"", newVal:"Market share leader that has acquire" },
+  { ts:"2026-08-21 08:59", user:"Kamaljit Gill", ticker:"SGI", field:"Conviction", oldVal:"", newVal:"2" },
+  { ts:"2026-08-21 08:59", user:"Kamaljit Gill", ticker:"SGI", field:"Direction", oldVal:"", newVal:"Long" },
+  { ts:"2026-08-21 08:59", user:"Kamaljit Gill", ticker:"SGI", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
+  { ts:"2026-08-21 08:59", user:"Kamaljit Gill", ticker:"SGI", field:"Company Name", oldVal:"", newVal:"Somnigroup" },
+  { ts:"2026-08-21 08:59", user:"Kamaljit Gill", ticker:"SGI", field:"Ticker", oldVal:"", newVal:"SGI" },
   { ts:"2026-08-14 09:21", user:"Tehmur Jabbar", ticker:"BBY", field:"Target Price", oldVal:"43 USD", newVal:"47" },
   { ts:"2026-08-14 09:19", user:"Tehmur Jabbar", ticker:"ONTO", field:"Conviction", oldVal:"4", newVal:"5" },
   { ts:"2026-08-14 09:18", user:"Tehmur Jabbar", ticker:"DSV DC", field:"Target Price", oldVal:"2500", newVal:"DKK2500" },
@@ -925,16 +935,9 @@ const AUDIT = [
   { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Direction", oldVal:"", newVal:"Short" },
   { ts:"2026-07-13 08:29", user:"Kamaljit Gill", ticker:"GIS", field:"Sector", oldVal:"", newVal:"Consumer Staples" },
   { ts:"2026-07-13 08:28", user:"Kamaljit Gill", ticker:"GIS", field:"Analyst", oldVal:"", newVal:"Kamaljit Gill" },
-  { ts:"2026-07-13 08:28", user:"Kamaljit Gill", ticker:"GIS", field:"Ticker", oldVal:"", newVal:"GIS" },
-  { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"Q3 Earnings" },
-  { ts:"2026-07-13 08:17", user:"Kamaljit Gill", ticker:"ATZ", field:"Next Catalyst", oldVal:"Q2 Earnings July 9", newVal:"" },
-  { ts:"2026-07-10 14:42", user:"Khaled Beydoun", ticker:"EQPT", field:"Assignments", oldVal:"", newVal:"PM-Assigned" },
-  { ts:"2026-07-10 10:18", user:"Youssef Ait Boulahri", ticker:"LOW", field:"Target Price", oldVal:"165 USD", newVal:"165" },
-  { ts:"2026-07-10 10:18", user:"Youssef Ait Boulahri", ticker:"LEN", field:"Target Price", oldVal:"70 EUR", newVal:"70" },
-  { ts:"2026-07-10 10:17", user:"Youssef Ait Boulahri", ticker:"H", field:"Sector", oldVal:"Consumer Discretionary", newVal:"Leisure" },
-  { ts:"2026-07-10 10:16", user:"Youssef Ait Boulahri", ticker:"LEN", field:"Target Price", oldVal:"70", newVal:"70 EUR" },
-  { ts:"2026-07-10 10:15", user:"Youssef Ait Boulahri", ticker:"LOW", field:"Target Price", oldVal:"165 JPY", newVal:"165 USD" }
+  { ts:"2026-07-13 08:28", user:"Kamaljit Gill", ticker:"GIS", field:"Ticker", oldVal:"", newVal:"GIS" }
 ];
+
 
 
 
