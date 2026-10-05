@@ -681,7 +681,7 @@ const STOCKS = [
   { ticker:"JHX", company:"James Hardie Industries", assignment:"Self-Sourced", dateAdded:"2026-04-30", analyst:"James Gildea", sector:"Housing", direction:"Long", conviction:"0", target:"35 USD", status:"Archived", catalyst:"", thesis:"Shares reacted negatively to investor day guide reaffirm; trade done for now", date:"2026-07-01", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/JHX Back Ground Slides v.1.2 (1).pptx?d=wd875b1bec24c48b1b3c26c0e33a0dfdf&csf=1&web=1&e=mECpzM", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/One Page Investment Memo JHX v.1.1.docx?d=web8b5b3aaa68419d915c571a665ff7de&csf=1&web=1&e=2mNOOc", held:"No", returnPct:"19.1", initPrice:"20.99", livePrice:"24.99" },
   { ticker:"VIK", company:"Viking Holdings Ltd", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Leisure", direction:"Long", conviction:"0", target:"80 USD", status:"Archived", catalyst:"VIK earns August 19", thesis:"Pure upper income North America; brand moat; stock expensive", date:"2026-07-09", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VIK Investment Case v.1.pptx?d=wc2165a22e0634ce29f856acbc1274d50&csf=1&web=1&e=0t8YJr", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"WSM", company:"Williams-Sonoma Inc.", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Consumer Discretionary", direction:"Long", conviction:"0", target:"260 USD", status:"Archived", catalyst:"", thesis:"Consumer strength; Pottery Barn turnaround", date:"2026-07-01", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
-  { ticker:"VICI", company:"VICI Properties Inc.", assignment:"Self-Sourced", dateAdded:"2026-07-07", analyst:"James Gildea", sector:"Real Estate", direction:"Short", conviction:"4", target:"19.75 USD", status:"Active", catalyst:"BofA REIT Conference September 15", thesis:"CZR exposure; stretching on risky deals", date:"2026-06-26", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VICI_Short_Deck_v.4.0.pptx?d=w53814c7bbf2949b4892dd1b6821a7abb&csf=1&web=1&e=omklU6", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/One Page Investment Memo VICI v.1.0.docx?d=w8aca5bd12db44f66b1808a2fa716d442&csf=1&web=1&e=xeLrep", held:"Yes", returnPct:"15.4", initPrice:"26.77", livePrice:"22.65" },
+  { ticker:"VICI", company:"VICI Properties Inc.", assignment:"Self-Sourced", dateAdded:"2026-07-07", analyst:"James Gildea", sector:"Real Estate", direction:"Short", conviction:"4", target:"19.75 USD", status:"Active", catalyst:"Earnings October 29", thesis:"CZR exposure; stretching on risky deals", date:"2026-10-05", link:"https://ripostecapitalllc.sharepoint.com/:p:/r/Shared Documents/Youssef%27s Projects/Analyst Research/VICI_Short_Deck_v.4.0.pptx?d=w53814c7bbf2949b4892dd1b6821a7abb&csf=1&web=1&e=omklU6", memo:"https://ripostecapitalllc.sharepoint.com/:w:/r/Shared Documents/Youssef%27s Projects/Analyst Research/One Page Investment Memo VICI v.1.0.docx?d=w8aca5bd12db44f66b1808a2fa716d442&csf=1&web=1&e=xeLrep", held:"Yes", returnPct:"15.4", initPrice:"26.77", livePrice:"22.65" },
   { ticker:"CCL", company:"Carnival Corporation", assignment:"PM-Assigned", dateAdded:"", analyst:"James Gildea", sector:"Leisure", direction:"Long", conviction:"0", target:"", status:"Archived", catalyst:"RCL earns July 29", thesis:"Inexpensive stock; leisure value proposition; headline risk", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"BX", company:"Blackstone Inc.", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"0", target:"", status:"Archived", catalyst:"", thesis:"Too big to grow; private credit fear and AI disrupt fear", date:"2026-07-09", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
   { ticker:"EG", company:"Everest Group Ltd.", assignment:"Self-Sourced", dateAdded:"", analyst:"James Gildea", sector:"Financials", direction:"Short", conviction:"0", target:"", status:"Archived", catalyst:"RNR earns July 23; ACGL July 28; EG Jul 30", thesis:"Sector pricing headwinds, weak player", date:"2026-06-26", link:"", memo:"", held:"No", returnPct:"", initPrice:"", livePrice:"" },
@@ -830,7 +830,9 @@ const STOCKS = [
 
 
 
+
 const AUDIT = [
+  { ts:"2026-10-05 14:43", user:"James Gildea", ticker:"VICI", field:"Next Catalyst", oldVal:"BofA REIT Conference September 15", newVal:"Earnings October 29" },
   { ts:"2026-10-02 13:40", user:"Youssef Ait Boulahri", ticker:"INDV", field:"Analyst", oldVal:"Kamaljit Gill", newVal:"Khaled Beydoun" },
   { ts:"2026-10-02 13:40", user:"Youssef Ait Boulahri", ticker:"CPNG", field:"Analyst", oldVal:"Kamaljit Gill", newVal:"Khaled Beydoun" },
   { ts:"2026-10-02 10:42", user:"Youssef Ait Boulahri", ticker:"RCI", field:"Assignments", oldVal:"PM-Assigned", newVal:"Self-Sourced" },
@@ -979,9 +981,9 @@ const AUDIT = [
   { ts:"2026-07-27 11:06", user:"James Gildea", ticker:"OWL", field:"Thesis / Notes", oldVal:"Oversold on Private Credit Fear", newVal:"Oversold on Private Credit fear" },
   { ts:"2026-07-27 11:05", user:"James Gildea", ticker:"OWL", field:"Status", oldVal:"", newVal:"Idea Pipeline" },
   { ts:"2026-07-27 11:05", user:"James Gildea", ticker:"OWL", field:"Thesis / Notes", oldVal:"", newVal:"Oversold on Private Credit Fear" },
-  { ts:"2026-07-27 11:05", user:"James Gildea", ticker:"OWL", field:"Next Catalyst", oldVal:"", newVal:"OWL Earnings July 30" },
-  { ts:"2026-07-27 11:04", user:"James Gildea", ticker:"OWL", field:"Conviction", oldVal:"", newVal:"2" }
+  { ts:"2026-07-27 11:05", user:"James Gildea", ticker:"OWL", field:"Next Catalyst", oldVal:"", newVal:"OWL Earnings July 30" }
 ];
+
 
 
 
